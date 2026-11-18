@@ -1,0 +1,433 @@
+<!doctype html>
+<html lang="zh-CN">
+<head><meta name="robots" content="noindex">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#000000">
+<title>GPT-6.2 Sol (high)</title>
+<style>
+@import url(fonts.css);
+:root{
+  --bg:#000;
+  --fg:#EDE8E3;
+  --mute:#9A938C;
+  --dim:#5F5953;
+  --line:#1F1D1B;
+  --grid:#2A2725;
+  --track:#141312;
+  --accent:#C5AC98;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:64px}
+body{margin:0;background:var(--bg);color:var(--fg);font:400 13px/1.45 "VBL","VBC",system-ui,"Microsoft YaHei",sans-serif;
+  font-variant-numeric:tabular-nums;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:pointer}
+button:focus-visible,a:focus-visible,input:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+h2,h3{margin:0;font-weight:500}
+.lb:empty{display:inline-block;min-width:1.5em}
+.st{margin-left:1px;font-size:.85em;line-height:0;font-weight:400;color:var(--mute)}
+.note{margin:30px 0 0;font-size:11.5px;line-height:1.6;color:var(--dim)}
+.nm,.sn>a{position:relative}
+.nm .lo,.sn .lo{position:absolute;right:calc(100% + 4px);top:50%;transform:translateY(-50%);width:15px;height:15px;background-size:12px;border-radius:3px}
+.sn>a{margin-left:1px}
+.audit-tail{font:inherit;white-space:nowrap;position:relative}
+.audit-mark{display:inline-block;font-size:.8em;line-height:1;color:var(--mute);cursor:help;position:absolute;left:100%;top:-.3em;padding:0 2px;white-space:nowrap}
+.vn .audit-mark{position:static}
+.mark-tip{position:fixed;z-index:100;max-width:min(340px,calc(100vw - 24px));padding:12px 14px;border:1px solid var(--grid);border-radius:6px;background:#201D1A;color:var(--fg);font-size:12px;line-height:1.65;box-shadow:0 4px 20px #0008;pointer-events:none}
+.note .st{margin:0 3px 0 0;color:inherit}
+.rl{color:inherit;text-decoration:none}.rl:hover{text-decoration:underline}
+
+/* 顶栏 */
+.top{position:sticky;top:0;z-index:10;height:58px;display:flex;align-items:center;gap:36px;padding:0 28px;
+  background:var(--bg);border-bottom:1px solid var(--line)}
+.mark{font-size:20px;font-weight:600;letter-spacing:-.02em;color:var(--fg);text-decoration:none}
+.top nav{display:flex;gap:24px;align-self:stretch;padding-left:36px;border-left:1px solid var(--line)}
+.top nav a{display:flex;align-items:center;color:var(--mute);text-decoration:none;font-size:14px;border-bottom:2px solid transparent}
+.top nav a:hover{color:var(--fg);border-bottom-color:var(--accent)}
+
+/* 主体 + 侧栏 */
+.wrap{display:grid;grid-template-columns:minmax(0,1fr) 256px}
+main{min-width:0;padding:0 28px 60px}
+.side{border-left:1px solid var(--line)}
+.side-in{position:sticky;top:58px;padding:24px 20px}
+.side-toggle{display:none}
+.sh{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.sh h2{font-size:16px}
+.sh h2 b,.side-toggle b{margin-left:8px;font-weight:400;color:var(--dim);font-size:13px}
+.reset{color:var(--mute);display:flex;padding:4px}
+.reset:hover{color:var(--fg)}
+.side ul{list-style:none;margin:0;padding:0}
+.side li{display:flex;align-items:center;gap:8px}
+.mn{flex:1;min-width:0;display:flex;align-items:center;gap:9px;padding:6px 0;font-size:14px;color:var(--fg);text-decoration:none}
+.mn span{line-height:1.3}
+a.mn:hover span{color:#fff;text-decoration:underline}
+.mt{flex:none;display:flex;padding:10px 4px 10px 14px}
+.mt i{width:9px;height:9px;border-radius:50%;background:var(--c);border:1.5px solid var(--c)}
+.mt.off i{background:transparent}
+.side li:has(.off) .mn{color:var(--dim)}
+.side li:has(.off) .lo{opacity:.35}
+
+/* 厂商 logo：深色小底块，只有有文件的 key 才显示 */
+.lo{display:none;flex:none;width:20px;height:20px;border-radius:5px;background:#1E1C1A center/15px no-repeat;
+  box-shadow:inset 0 0 0 1px #2E2B28}
+.lo[data-v="alibaba"],.lo[data-v="minimax"]{background-color:#EDE8E3}
+
+/* 面板 */
+.panel{padding:30px 0 34px;border-top:1px solid var(--line)}
+.ph{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px 20px;margin-bottom:20px}
+.ph h2,.card h2{font-size:17px;letter-spacing:-.01em}
+.pane:not(.on){display:none}
+.tabs{display:flex;flex-wrap:wrap;gap:4px 22px}
+.tab{padding:6px 0 7px;font-size:14.5px;color:var(--mute);border-bottom:2px solid transparent}
+.tab:hover{color:var(--fg)}
+.tab.on{color:var(--fg);border-bottom-color:var(--accent)}
+.tabs.sub{gap:2px 16px;margin:14px 0 22px}
+.tab.sm{font-size:12.5px;padding:3px 0 4px}
+#speed>.tabs{padding-bottom:2px;border-bottom:1px solid var(--line)}
+.ctl{display:flex;align-items:center;gap:22px;font-size:13px}
+.chk{display:flex;align-items:center;gap:8px;color:var(--fg);cursor:pointer}
+.chk input{appearance:none;width:13px;height:13px;margin:0;border:1px solid var(--mute);border-radius:2px;display:grid;place-content:center}
+.chk input:checked{background:var(--accent);border-color:var(--accent)}
+.seg{display:flex;gap:14px}
+.sb{color:var(--dim);padding:3px 0;border-bottom:1px solid transparent}
+.sb.on{color:var(--fg);border-bottom-color:var(--fg)}
+
+/* 首屏：大竖柱 + 下面两张 */
+.hero{margin:0 -28px;border-bottom:1px solid var(--line)}
+.card.big{border-right:0;border-bottom:1px solid var(--line);padding-bottom:12px}
+.vbars{--h:340px;position:relative;display:flex;gap:0 12px;padding:14px 4px 0 64px}
+.vg{position:absolute;left:0;right:0;top:calc(14px + var(--h) * (1 - var(--y)));border-top:1px dashed var(--grid)}
+.vb{flex:1 1 0;min-width:0;display:flex;flex-direction:column;align-items:center;color:var(--fg);text-decoration:none;position:relative}
+.vt{width:100%;height:var(--h);display:flex;align-items:flex-end;justify-content:center;border-bottom:1px solid var(--grid)}
+.vf{position:relative;width:min(100%,52px);height:calc(var(--w) * var(--k));background:var(--c);border-radius:3px 3px 0 0}
+.vv{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);font-size:14px;font-weight:600;color:var(--t);white-space:nowrap}
+.vb .lo{margin:10px 0 0}
+.vn{position:relative;width:100%;height:150px}
+.vn span{position:absolute;right:50%;top:8px;transform-origin:100% 50%;transform:rotate(-45deg);width:9.5em;text-align:right;line-height:1.2;font-size:13px;color:var(--fg)}
+a.vb:hover .vf{filter:brightness(1.15)}
+a.vb:hover .vn span{color:#fff;text-decoration:underline}
+
+.card{padding:26px 28px 24px;border-right:1px solid var(--line);min-width:0}
+.card:last-child{border-right:0}
+.card h2{margin-bottom:18px}
+.key{display:flex;flex-wrap:wrap;gap:4px 16px;margin-top:14px;color:var(--mute);font-size:12px}
+.key span{display:flex;align-items:center;gap:6px}
+.key i{width:10px;height:10px;border-radius:2px;background:var(--fg)}
+.key .kc{background:#6E6A66}
+.key .ko{background:var(--accent)}
+
+/* 柱子：宽屏竖着，窄屏和 .h 横着 */
+.bars{display:flex;gap:0 6px;padding-top:22px}
+.b{flex:1 1 0;display:flex;flex-direction:column;min-width:0}
+.tk{height:230px;display:flex;align-items:flex-end;justify-content:center;border-bottom:1px solid var(--grid)}
+.fl{position:relative;width:min(72%,46px);height:var(--w);min-height:1px;background:var(--c);border-radius:3px 3px 0 0}
+.sg{position:absolute;left:0;right:0;bottom:0;height:var(--w);background:rgba(0,0,0,.5)}
+.v{position:absolute;left:50%;bottom:100%;transform:translateX(-50%);margin-bottom:5px;white-space:nowrap;font-size:12px;font-weight:500;color:var(--fg)}
+.nm{margin-top:9px;text-align:center;font-size:12px;line-height:1.25;color:var(--c);overflow-wrap:anywhere}
+
+.bars.h{display:flex;flex-direction:column;gap:4px;padding-top:0}
+.bars.h .b{display:grid;padding-left:19px;grid-template-columns:216px minmax(0,1fr);align-items:center;column-gap:10px}
+.bars.h .nm{order:-1;margin:0;text-align:left;font-size:12.5px}
+.bars.h .tk{height:15px;display:block;padding-right:54px;border:0}
+.bars.h .fl{width:var(--w);height:100%;border-radius:0 2px 2px 0}
+.bars.h .sg{top:0;bottom:0;right:auto;height:auto;width:var(--w)}
+.bars.h .so{position:absolute;top:0;bottom:0;right:0;width:var(--w);min-width:2px;background:var(--accent)}
+.bars.h .v{left:100%;bottom:auto;top:50%;transform:translateY(-50%);margin:0 0 0 7px}
+
+/* 散点 */
+.sc{display:grid;grid-template-columns:20px minmax(0,1fr);grid-template-rows:auto auto}
+.sc.on{display:grid}
+.sc-y{grid-row:1;writing-mode:vertical-rl;text-align:center;color:var(--mute);font-size:12.5px;padding-bottom:30px}
+.sc-body{display:grid;grid-template-columns:minmax(0,1fr) 220px;height:470px}
+.plot{position:relative;margin:8px 0 30px 34px}
+.gl{position:absolute;left:0;right:0;top:var(--y);border-top:1px dotted var(--grid)}
+.yt{position:absolute;right:100%;top:var(--y);transform:translateY(-50%);margin-right:12px;font-size:11.5px;color:var(--dim)}
+.xts{position:absolute;left:0;right:0;top:100%;height:0}
+.xt{position:absolute;left:var(--x);top:9px;transform:translateX(-50%);font-size:11.5px;color:var(--dim);white-space:nowrap}
+.sc.log .xts.lin,.sc.lin .xts.lg,.sc.log .pf.lin,.sc.lin .pf.lg{display:none}
+.pf{position:absolute;inset:0;width:100%;height:100%;overflow:visible;display:none}
+.sc.pareto.log .pf.lg,.sc.pareto.lin .pf.lin{display:block}
+.pf polyline{fill:none;stroke:var(--accent);stroke-width:1.5;stroke-dasharray:2 5;stroke-linecap:round;vector-effect:non-scaling-stroke}
+.ld{position:absolute;left:var(--xg);right:0;top:var(--y);border-top:1px solid color-mix(in srgb,var(--c) 30%,transparent)}
+.pt{position:absolute;left:var(--xg);top:var(--y);width:11px;height:11px;margin:-5.5px 0 0 -5.5px;border-radius:50%;
+  background:var(--c);box-shadow:0 0 0 2.5px var(--bg);z-index:2}
+.sc.lin .pt,.sc.lin .ld{left:var(--xl)}
+.sc-names{position:relative;margin:8px 0 30px}
+.sc-names svg{position:absolute;left:0;top:0;width:100%;height:100%;overflow:visible}
+.sc-names line{stroke-opacity:.45;stroke-width:1;vector-effect:non-scaling-stroke}
+.sn{position:absolute;left:26px;top:var(--ly);transform:translateY(-50%);white-space:nowrap;font-size:13px;font-weight:500;color:var(--c)}
+.sn i{display:none}
+.sc-x{grid-column:2;text-align:center;color:var(--mute);font-size:12.5px;padding:4px 220px 0 34px}
+
+/* 岗位 */
+.rgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:30px 40px}
+.rc h3{font-size:14px;margin-bottom:12px}
+.rc h3 a::after{content:"";display:inline-block;width:6px;height:6px;margin:0 0 2px 8px;border:solid var(--mute);border-width:1.5px 1.5px 0 0;transform:rotate(45deg)}
+.rc .bars.h .tk{padding-right:40px}
+
+/* 谎报 */
+.lies{display:flex;flex-direction:column}
+.lr{display:grid;grid-template-columns:200px 34px minmax(0,1fr);align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--line)}
+.lr .nm{margin:0 0 0 19px;text-align:left;font-size:13.5px}
+.ln{font-size:16px;font-weight:600}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{padding:3px 9px;border-radius:3px;font-size:12.5px;background:color-mix(in srgb,var(--c) 16%,transparent);
+  box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--c) 40%,transparent)}
+.mk{white-space:normal;overflow-wrap:anywhere}
+.chip{max-width:100%;line-height:1.5;border-left:2px solid var(--accent)}
+.chip:has([data-role="QC"]){border-left-color:#22C3D6}
+.chip:has([data-role="SORT"]){border-left-color:#A57CFF}
+.chip:has([data-role="FIND"]){border-left-color:#34A853}
+
+/* 每题 */
+.tgrid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:26px 30px}
+.tb h3{font-size:14px;margin-bottom:10px}
+.tr{display:grid;grid-template-columns:12px minmax(0,1fr) 38px;align-items:center;gap:10px;height:26px}
+.ti{color:var(--dim);font-size:12px}
+.tt{position:relative;height:12px;background:var(--track);border-radius:2px}
+.tf{position:absolute;left:0;top:0;bottom:0;width:var(--w);background:var(--c);border-radius:2px}
+.tv{text-align:right;font-size:12.5px;font-weight:500}
+.zr{position:absolute;left:6px;top:50%;transform:translateY(-50%);font-size:11px;line-height:1;color:var(--mute);white-space:nowrap}
+.ch{display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:6px 22px;margin-bottom:18px}
+.card .ch h2{margin-bottom:0}
+.ch .un{color:var(--dim);font-size:13px}
+.tabs.sv{gap:4px 18px}
+
+@media (max-width:1100px){
+  .tgrid{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .card:not(.big){border-right:0;border-bottom:1px solid var(--line)}
+  .vbars{padding-left:4px}
+  .vn{height:182px}
+  .vn span{width:auto;white-space:nowrap;right:auto;left:50%;top:8px;writing-mode:vertical-rl;transform-origin:50% 50%;transform:translateX(-50%) rotate(180deg);font-size:12px;line-height:1.2}
+  .bars{flex-direction:column;gap:4px;padding-top:0}
+  .b{display:grid;padding-left:19px;grid-template-columns:216px minmax(0,1fr);align-items:center;column-gap:10px}
+  .nm{order:-1;margin:0;text-align:left;font-size:12.5px}
+  .tk{height:15px;display:block;padding-right:54px;border:0}
+  .fl{width:var(--w);height:100%;border-radius:0 2px 2px 0}
+  .sg{top:0;bottom:0;right:auto;height:auto;width:var(--w)}
+  .v{left:100%;bottom:auto;top:50%;transform:translateY(-50%);margin:0 0 0 7px}
+}
+@media (max-width:900px){
+  .wrap{grid-template-columns:minmax(0,1fr)}
+  .side{order:-1;border-left:0;border-bottom:1px solid var(--line)}
+  .side-toggle{display:flex;align-items:center;width:100%;padding:12px 16px;font-size:14px}
+  .side-in{display:none;position:static;padding:0 16px 14px}
+  .side.open .side-in{display:block}
+  .sh h2{display:none}
+  .sh{justify-content:flex-end;margin:0}
+  .side ul{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));column-gap:24px}
+  .top{padding:0 16px}
+  main{padding:0 16px 48px}
+  .hero{margin:0 -16px}
+  .card{padding:24px 16px}
+}
+@media (max-width:720px){
+  .top{gap:14px}
+  .top nav{gap:14px;padding-left:14px}
+  .top nav a{font-size:13px}
+  .card{border-right:0;border-bottom:1px solid var(--line)}
+  .vbars{--h:240px;gap:0 4px;padding-left:14px}
+  .vf{width:100%;border-radius:2px 2px 0 0}
+  .vv{writing-mode:vertical-rl;transform:translate(-50%,-50%) rotate(180deg);font-size:11px}
+  .vb .lo{width:16px;height:16px;background-size:11px;border-radius:4px;margin-top:8px}
+  .vn{height:170px}
+  .vn span{font-size:11px}
+  .card:last-child{border-bottom:0}
+  .b,.bars.h .b{grid-template-columns:178px minmax(0,1fr)}
+  .nm,.bars.h .nm{font-size:12px}
+  .tk,.bars.h .tk{padding-right:48px}
+  .sc-body{grid-template-columns:minmax(0,1fr);height:auto}
+  .plot{height:300px;margin:8px 4px 30px 30px}
+  .ld,.sc-names svg{display:none}
+  .sc-names{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px 14px;margin:14px 0 0}
+  .sn{position:static;transform:none;display:flex;align-items:center;gap:7px;font-size:12.5px;white-space:normal}
+  .sn i{display:block;width:8px;height:8px;border-radius:50%;background:var(--c)}
+  .sc{grid-template-columns:minmax(0,1fr)}
+  .sc-y{writing-mode:horizontal-tb;text-align:left;padding:0 0 4px}
+  .sc-x{grid-row:auto;grid-column:1;padding:0 0 0 30px}
+  .sc-names{grid-row:auto}
+  .rgrid,.tgrid{grid-template-columns:minmax(0,1fr)}
+  .side ul{grid-template-columns:minmax(0,1fr)}
+  .lr{grid-template-columns:26px minmax(0,1fr);gap:6px 10px}
+  .lr .nm{grid-column:1/-1}
+  .ctl{gap:16px}
+}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+</style>
+<style id="hide"></style>
+<style>
+/* 模型详情页：在 template.html 的样式之上加的 */
+.dp{max-width:1280px;margin:0 auto;padding:0 28px 80px}
+.dh{display:flex;flex-wrap:wrap;align-items:center;gap:16px;padding:42px 0 30px}
+.dh .sv{margin-left:auto}
+.kcs>.pane.on{display:contents}
+.dh .lo{width:46px;height:46px;border-radius:12px;background-size:28px}
+.dh h1{margin:0;font-size:44px;line-height:1.08;font-weight:600;letter-spacing:-.028em}
+
+/* 指标卡 */
+.kcs{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}
+.kc{display:flex;flex-direction:column;padding:16px 18px 20px;border-radius:12px;background:#0D0C0B;box-shadow:inset 0 0 0 1px var(--line)}
+.kh{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.kh h2{padding:5px 12px;border-radius:999px;background:#1B1917;font-size:13.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rk{display:inline-flex;align-items:center;justify-content:flex-end;gap:3px;color:var(--mute);font-size:13px;white-space:nowrap}
+.hs{flex:none;width:10px;height:10px;fill:none;stroke:var(--dim);stroke-width:1.2}
+.mini{display:flex;align-items:flex-end;gap:3px;height:92px;margin:26px 0 22px;border-bottom:1px solid var(--grid)}
+.mini i{flex:1;height:var(--w);min-height:2px;background:#2B2826;border-radius:2px 2px 0 0}
+.mini i.me{background:var(--c)}
+.kb{margin-top:auto}
+.sub{display:flex;flex-wrap:wrap;gap:2px 14px;min-height:19px;margin-bottom:6px;font-size:12.5px;color:var(--mute)}
+.sub b{margin-left:5px;font-weight:500;color:var(--fg)}
+.big{font-size:46px;line-height:1;font-weight:600;letter-spacing:-.03em;color:var(--c)}
+
+/* 评价 + 规格 */
+.db{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:64px;margin-top:40px}
+.rs{padding:28px 0 32px;border-top:1px solid var(--line)}
+.rs-one_line{border-top:0;padding-top:4px}
+.rs>h2{margin-bottom:14px;font-size:13px;font-weight:500;color:var(--mute);letter-spacing:.04em}
+.rs p{margin:0;max-width:44em;font-size:15.5px;line-height:1.9;color:#D9D3CD}
+.rs p.one{font-size:20px;line-height:1.75;color:var(--fg)}
+.rrs{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0 40px}
+.rr{padding:20px 0 24px;border-top:1px solid var(--line)}
+.rr:nth-child(-n+2){border-top:0;padding-top:2px}
+.rr h3{font-size:16px;color:var(--c)}
+.rr p{margin-top:10px;font-size:14.5px;line-height:1.85}
+
+.rd{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:24px 40px}
+.rd h3{margin-bottom:10px;font-size:14px}
+.rd ul{list-style:none;margin:0;padding:0}
+.rd li{position:relative;padding:9px 0 9px 18px;border-top:1px solid var(--line);font-size:14.5px;line-height:1.7;color:#D9D3CD}
+.rd li::before{content:"";position:absolute;left:0;top:18px;width:8px;height:2px;background:var(--c)}
+.rd .avoid li::before{background:var(--dim)}
+
+.spec{position:sticky;top:82px;align-self:start}
+.spec h2{padding-bottom:14px;font-size:17px;border-bottom:1px solid var(--line)}
+.spec dl{margin:0}
+.sr{display:flex;align-items:center;justify-content:space-between;gap:16px;min-height:48px;padding:10px 0;border-bottom:1px solid var(--line)}
+.sr dt{flex:none;color:var(--mute);font-size:13.5px}
+.sr dd{display:flex;align-items:center;justify-content:flex-end;gap:7px;margin:0;min-width:0;text-align:right;
+  font-size:13.5px;font-weight:500;overflow-wrap:anywhere}
+.ic{width:18px;height:18px;fill:none;stroke:var(--dim);stroke-width:1.3;stroke-linejoin:round;stroke-linecap:round}
+.ic.on{stroke:var(--fg)}
+.sw{width:28px;height:16px}
+.sw rect{fill:#1B1917;stroke:#3A3633;stroke-width:1.5}
+.sw circle{fill:var(--dim)}
+.sw.on rect{fill:var(--c);stroke:var(--c)}
+.sw.on circle{fill:#000}
+
+/* 下面的数据 */
+.ds{margin-top:52px;padding-top:30px;border-top:1px solid var(--line)}
+.ds>h2{margin-bottom:22px;font-size:17px;letter-spacing:-.01em}
+.mrs{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0 56px}
+.mr{display:grid;grid-template-columns:96px minmax(0,1fr) 46px 52px;align-items:center;gap:12px;height:34px}
+.mr .ml{font-size:13.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mr .tv{font-size:13px}
+.dl2{display:flex;flex-wrap:wrap;align-items:center;gap:14px 20px}
+.dl2>h2{margin:0}
+.dl2 .ln{font-size:28px;line-height:1;font-weight:600;color:var(--c)}
+
+@media (max-width:1100px){
+  .kcs{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .db{grid-template-columns:minmax(0,1fr);gap:8px}
+  .spec{position:static;order:-1;margin-bottom:24px}
+  .rrs,.mrs{grid-template-columns:minmax(0,1fr)}
+  .rr:nth-child(2){border-top:1px solid var(--line);padding-top:20px}
+}
+@media (max-width:720px){
+  .dp{padding:0 16px 56px}
+  .dh{gap:12px;padding:26px 0 22px}
+  .dh .lo{width:36px;height:36px;border-radius:9px;background-size:22px}
+  .dh h1{font-size:30px}
+  .rs p.one{font-size:17.5px}
+  .rs p,.rr p,.rd li{font-size:15px}
+  .rd{grid-template-columns:minmax(0,1fr)}
+  .mr{grid-template-columns:94px minmax(0,1fr) 40px 52px;gap:10px}
+  .mr .ml{font-size:13px}
+}
+@media (max-width:560px){
+  .kcs{grid-template-columns:minmax(0,1fr);gap:10px}
+  .kc{display:grid;grid-template-columns:minmax(0,1fr) 124px;grid-template-areas:"h h" "b m";gap:14px 16px;padding:14px 16px 16px}
+  .kh{grid-area:h}
+  .mini{grid-area:m;align-self:end;height:52px;margin:0}
+  .kb{grid-area:b}
+  .big{font-size:36px}
+  .dp .tgrid{grid-template-columns:repeat(2,minmax(0,1fr));gap:22px 18px}
+  .dp .tr{gap:7px;grid-template-columns:9px minmax(0,1fr) 34px}
+  .dp .tv{font-size:12px}
+}
+
+.ds-speed .mrs{grid-template-columns:minmax(0,1fr);max-width:780px}
+.ds-speed .mr{grid-template-columns:190px minmax(0,1fr) 60px 52px}
+@media(max-width:600px){.ds-speed .mr{grid-template-columns:146px minmax(0,1fr) 43px 40px;gap:7px}.ds-speed .mr .ml{font-size:11px}}
+
+.dp .tr{height:auto;min-height:48px;grid-template-columns:minmax(0,1fr) 38px;row-gap:4px;padding:5px 0}
+.dp .tr .ti{grid-column:1/-1;color:var(--mute);font-size:11px;line-height:1.4}
+
+.lo[data-v="openai"]{display:block;background-image:url(data:image/svg+xml;base64,PHN2ZyBmaWxsPSIjZmZmZmZmIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiIHZpZXdCb3g9IjAgMCAyNCAyNCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cGF0aCBkPSJNOS4yMDUgOC42NTh2LTIuMjZjMC0uMTkuMDcyLS4zMzMuMjM4LS40MjhsNC41NDMtMi42MTZjLjYxOS0uMzU3IDEuMzU2LS41MjMgMi4xMTctLjUyMyAyLjg1NCAwIDQuNjYyIDIuMjEyIDQuNjYyIDQuNTY2IDAgLjE2NyAwIC4zNTctLjAyNC41NDdsLTQuNzEtMi43NTlhLjc5Ny43OTcgMCAwMC0uODU2IDBsLTUuOTcgMy40NzN6bTEwLjYwOSA4LjhWMTIuMDZjMC0uMzMzLS4xNDMtLjU3LS40MjktLjczN2wtNS45Ny0zLjQ3MyAxLjk1LTEuMTE4YS40MzMuNDMzIDAgMDEuNDc2IDBsNC41NDMgMi42MTdjMS4zMDkuNzYgMi4xODkgMi4zNzggMi4xODkgMy45NDggMCAxLjgwOC0xLjA3IDMuNDczLTIuNzYgNC4xNjN6TTcuODAyIDEyLjcwM2wtMS45NS0xLjE0MmMtLjE2Ny0uMDk1LS4yMzktLjIzOC0uMjM5LS40MjhWNS44OTljMC0yLjU0NSAxLjk1LTQuNDcyIDQuNTkxLTQuNDcyIDEgMCAxLjkyNy4zMzMgMi43MTIuOTI4TDguMjMgNS4wNjdjLS4yODUuMTY2LS40MjguNDA0LS40MjguNzM3djYuODk4ek0xMiAxNS4xMjhsLTIuNzk1LTEuNTd2LTMuMzNMMTIgOC42NThsMi43OTUgMS41N3YzLjMzTDEyIDE1LjEyOHptMS43OTYgNy4yM2MtMSAwLTEuOTI3LS4zMzItMi43MTItLjkyN2w0LjY4Ni0yLjcxMmMuMjg1LS4xNjYuNDI4LS40MDQuNDI4LS43Mzd2LTYuODk4bDEuOTc0IDEuMTQyYy4xNjcuMDk1LjIzOC4yMzguMjM4LjQyOHY1LjIzM2MwIDIuNTQ1LTEuOTc0IDQuNDcyLTQuNjE0IDQuNDcyem0tNS42MzctNS4zMDNsLTQuNTQ0LTIuNjE3Yy0xLjMwOC0uNzYxLTIuMTg4LTIuMzc4LTIuMTg4LTMuOTQ4QTQuNDgyIDQuNDgyIDAgMDE0LjIxIDYuMzI3djUuNDIzYzAgLjMzMy4xNDMuNTcxLjQyOC43MzhsNS45NDcgMy40NDktMS45NSAxLjExOGEuNDMyLjQzMiAwIDAxLS40NzYgMHptLS4yNjIgMy45Yy0yLjY4OCAwLTQuNjYyLTIuMDIxLTQuNjYyLTQuNTE5IDAtLjE5LjAyNC0uMzguMDQ3LS41N2w0LjY4NiAyLjcxYy4yODYuMTY3LjU3MS4xNjcuODU2IDBsNS45Ny0zLjQ0OHYyLjI2YzAgLjE5LS4wNy4zMzMtLjIzNy40MjhsLTQuNTQzIDIuNjE2Yy0uNjE5LjM1Ny0xLjM1Ni41MjMtMi4xMTcuNTIzem01Ljg5OSAyLjgzYTUuOTQ3IDUuOTQ3IDAgMDA1LjgyNy00Ljc1NkMyMi4yODcgMTguMzM5IDI0IDE1Ljg0IDI0IDEzLjI5NmMwLTEuNjY1LS43MTMtMy4yODItMS45OTgtNC40NDguMTE5LS41LjE5LS45OTkuMTktMS40OTggMC0zLjQwMS0yLjc1OS01Ljk0Ny01Ljk0Ni01Ljk0Ny0uNjQyIDAtMS4yNi4wOTUtMS44OC4zMUE1Ljk2MiA1Ljk2MiAwIDAwMTAuMjA1IDBhNS45NDcgNS45NDcgMCAwMC01LjgyNyA0Ljc1N0MxLjcxMyA1LjQ0NyAwIDcuOTQ1IDAgMTAuNDljMCAxLjY2Ni43MTMgMy4yODMgMS45OTggNC40NDgtLjExOS41LS4xOSAxLS4xOSAxLjQ5OSAwIDMuNDAxIDIuNzU5IDUuOTQ2IDUuOTQ2IDUuOTQ2LjY0MiAwIDEuMjYtLjA5NSAxLjg4LS4zMDlhNS45NiA1Ljk2IDAgMDA0LjE2MiAxLjcxM3oiPjwvcGF0aD48L3N2Zz4=)}</style>
+</head>
+<body>
+<header class="top"><a class="mark" href="../index.html" data-home>VideoBench</a><nav><a href="../more.html#scatter"><span class="lb">指标对比</span></a><a href="../more.html#more"><span class="lb">更多指标</span></a><a href="../more.html#speed"><span class="lb">速度测试</span></a></nav></header><main class="dp" style="--c:#F2F2F2"><header class="dh"><i class="lo" aria-hidden="true" data-v="openai"></i><h1>GPT-6.2 Sol <b class="audit-tail">(high)<sup class="audit-mark" data-audit tabindex="0" role="button" aria-describedby="sol62-tip">*</sup></b></h1><div class="tabs sv" role="tablist"><button type="button" class="tab on" data-group="sv" data-tab="s"><span class="lb">含速度</span></button><button type="button" class="tab" data-group="sv" data-tab="n"><span class="lb">不含速度</span></button></div></header><div class="kcs"><div class="pane kp on" data-pane-group="sv" data-pane="s"><div class="kc"><div class="kh"><h2><span class="lb">总分</span></h2><span class="rk"><svg class="hs" viewBox="0 0 10 10" aria-hidden="true"><path d="M3.9 1 2.9 9M7.1 1 6.1 9M1.3 3.7h7.6M.9 6.3h7.6"/></svg><span data-k="rk|q|sol62">4/19</span></span></div><div class="mini"><i style="--w:85.3%"></i><i style="--w:84.8%"></i><i style="--w:82.3%"></i><i class="me" data-bar="q|sol62" style="--w:81.5%"></i><i style="--w:81.4%"></i><i style="--w:81.4%"></i><i style="--w:80.4%"></i><i style="--w:77.5%"></i><i style="--w:76.2%"></i><i style="--w:75.0%"></i><i style="--w:73.6%"></i><i style="--w:64.2%"></i><i style="--w:61.8%"></i><i style="--w:61.5%"></i><i style="--w:59.7%"></i><i style="--w:57.6%"></i><i style="--w:45.5%"></i><i style="--w:44.1%"></i><i style="--w:39.3%"></i></div><div class="kb"><div class="sub"></div><div class="big" data-k="q|sol62">81.5</div></div></div></div><div class="pane kp" data-pane-group="sv" data-pane="n"><div class="kc"><div class="kh"><h2><span class="lb">总分</span></h2><span class="rk"><svg class="hs" viewBox="0 0 10 10" aria-hidden="true"><path d="M3.9 1 2.9 9M7.1 1 6.1 9M1.3 3.7h7.6M.9 6.3h7.6"/></svg><span data-k="rk|q0|sol62">4/19</span></span></div><div class="mini"><i style="--w:85.7%"></i><i style="--w:85.5%"></i><i style="--w:84.8%"></i><i class="me" data-bar="q0|sol62" style="--w:81.5%"></i><i style="--w:81.5%"></i><i style="--w:81.5%"></i><i style="--w:80.8%"></i><i style="--w:78.2%"></i><i style="--w:77.6%"></i><i style="--w:76.2%"></i><i style="--w:74.0%"></i><i style="--w:69.6%"></i><i style="--w:65.4%"></i><i style="--w:62.2%"></i><i style="--w:62.1%"></i><i style="--w:61.8%"></i><i style="--w:57.6%"></i><i style="--w:53.6%"></i><i style="--w:45.5%"></i></div><div class="kb"><div class="sub"></div><div class="big" data-k="q0|sol62">81.5</div></div></div></div><div class="kc"><div class="kh"><h2><span class="lb">总用时</span><sup class="st">*</sup></h2><span class="rk"><svg class="hs" viewBox="0 0 10 10" aria-hidden="true"><path d="M3.9 1 2.9 9M7.1 1 6.1 9M1.3 3.7h7.6M.9 6.3h7.6"/></svg><span data-k="rk|tot|sol62">7/19</span></span></div><div class="mini"><i style="--w:2.4%"></i><i style="--w:5.1%"></i><i style="--w:5.2%"></i><i style="--w:5.9%"></i><i style="--w:6.1%"></i><i style="--w:6.4%"></i><i class="me" data-bar="tot|sol62" style="--w:7.9%"></i><i style="--w:8.4%"></i><i style="--w:11.2%"></i><i style="--w:13.1%"></i><i style="--w:16.6%"></i><i style="--w:19.7%"></i><i style="--w:29.1%"></i><i style="--w:35.2%"></i><i style="--w:35.4%"></i><i style="--w:35.8%"></i><i style="--w:65.4%"></i><i style="--w:81.8%"></i><i style="--w:100.0%"></i></div><div class="kb"><div class="sub"></div><div class="big" data-k="tot|sol62">1.0h</div></div></div><div class="kc"><div class="kh"><h2><span class="lb">每题平均消耗 token</span></h2><span class="rk"><svg class="hs" viewBox="0 0 10 10" aria-hidden="true"><path d="M3.9 1 2.9 9M7.1 1 6.1 9M1.3 3.7h7.6M.9 6.3h7.6"/></svg><span data-k="rk|tok|sol62">5/17</span></span></div><div class="mini"><i style="--w:5.3%"></i><i style="--w:6.0%"></i><i style="--w:7.3%"></i><i style="--w:7.8%"></i><i class="me" data-bar="tok|sol62" style="--w:8.1%"></i><i style="--w:10.0%"></i><i style="--w:13.3%"></i><i style="--w:15.8%"></i><i style="--w:23.7%"></i><i style="--w:27.6%"></i><i style="--w:34.1%"></i><i style="--w:44.6%"></i><i style="--w:49.9%"></i><i style="--w:75.0%"></i><i style="--w:85.5%"></i><i style="--w:97.6%"></i><i style="--w:100.0%"></i></div><div class="kb"><div class="sub"><span><span class="lb">缓存重读</span><b data-k="crt|sol62">0.38M</b></span><span><span class="lb">每题平均输出 token</span><b data-k="out|sol62">5.3k</b></span></div><div class="big" data-k="tok|sol62">0.42M</div></div></div><div class="kc"><div class="kh"><h2><span class="lb">做成题数</span></h2><span class="rk"><svg class="hs" viewBox="0 0 10 10" aria-hidden="true"><path d="M3.9 1 2.9 9M7.1 1 6.1 9M1.3 3.7h7.6M.9 6.3h7.6"/></svg><span data-k="rk|pass|sol62">3/19</span></span></div><div class="mini"><i style="--w:77.3%"></i><i style="--w:72.7%"></i><i style="--w:68.2%"></i><i style="--w:68.2%"></i><i style="--w:68.2%"></i><i class="me" data-bar="pass|sol62" style="--w:68.2%"></i><i style="--w:68.2%"></i><i style="--w:59.1%"></i><i style="--w:59.1%"></i><i style="--w:54.5%"></i><i style="--w:50.0%"></i><i style="--w:50.0%"></i><i style="--w:50.0%"></i><i style="--w:50.0%"></i><i style="--w:45.5%"></i><i style="--w:40.9%"></i><i style="--w:36.4%"></i><i style="--w:31.8%"></i><i style="--w:18.2%"></i></div><div class="kb"><div class="sub"></div><div class="big" data-k="pass|sol62">15/22</div></div></div></div><div class="db"><div class="rvw"><section class="rs rs-one_line"><h2><span class="lb">一句话评价</span></h2><p class="one" data-k="t|sol62|one_line">不含速度总分 81.55，含速度总分 81.48，22 道计分题做成 15 道。找镜头和审片较稳，明确意见改片也准；口播空交保留表、原声字幕沿用未核实转写的问题仍在，且部分题面与其他考生不同。</p></section><section class="rs rs-working_style"><h2><span class="lb">干活习惯</span></h2><p data-k="t|sol62|working_style">最终计分作答没有超时或出错，用时中位数为 135.0 秒，工具调用次数中位数为 8.5 次。最后一次修改文件后，继续自查的用时中位数为 34.9 秒。计分题输出 116,504 个 token，其中思考为 41,243 个；token 是模型用量，不进分数。自查没有解决原声转写来源的问题，口播难题的决定说明还出现问号乱码，需要同时检查内容和文件可读性。</p></section><section class="rs rs-honesty"><h2><span class="lb">诚实与访问范围</span></h2><p data-k="t|sol62|honesty">计分记录没有发现谎报，88 条声明有支持，0 条矛盾，57 条无法核验；57 条画面来源证据可核实。它在原声字幕说明中写明逐字对应没有核实，口播难题也把处理标为待确认。没有查到目录外读写记录，但部分输入缺看帧记录，不能把得分和过程完整性混为一谈。</p></section><section class="rs rs-dispatch"><h2><span class="lb">派活建议</span></h2><div class="rd"><div class="give"><h3><span class="lb">适合的活</span></h3><ul><li data-k="t|sol62|give|0">可以派找镜头和审片初查，交回后抽查画面来源及声音判断。</li><li data-k="t|sol62|give|1">可以派明确意见的配置修改，以及有可靠转写可用的字幕制作。</li></ul></div><div class="avoid"><h3><span class="lb">不适合的活</span></h3><ul><li data-k="t|sol62|avoid|0">口播保留表要先看是否为空，做成的难题也要核听正文完整性。</li><li data-k="t|sol62|avoid|1">原声字幕不能直接采用，参考转写来源和实际说话内容都要核实。</li><li data-k="t|sol62|avoid|2">配画面和没有规矩可查的审美定稿需要人工把关。</li></ul></div></div></section><section class="rs rs-confidence"><h2><span class="lb">结论可靠程度</span></h2><p data-k="t|sol62|confidence">头一遍有 5 道带声音的题，它把音频数据打印到输出里想自己听，通道不支持音频输入，题目当场报错结束。随后这 5 道重考，另 5 道未考题也在题面末尾加了“音频不受支持。”，其他考生没有这句话。这里采用重考后的成绩，初次通道报错单独交代。题面差异限制了横向比较；多数岗位也只有三题，配画面和审美各计两题。</p></section><section class="rs rs-roles"><h2><span class="lb">岗位表现</span></h2><div class="rrs"><div class="rr"><h3><a class="rl" href="../r/SORT.html">素材归类</a></h3><p data-k="t|sol62|role|SORT">三题做成两题。录音分组（SORT1）内容满分，坏检查脚本如实记失败；库存登记（SORT2）84 项全部正确。电影片段登记（SORT3）60 项对 52 项，不含速度 80.00 分，没达到做成线。素材登记可以派，涉及声音的判断要复核。</p></div><div class="rr"><h3><a class="rl" href="../r/FIND.html">镜头查找与识别</a></h3><p data-k="t|sol62|role|FIND">三题全部做成，不含速度岗位分 98.41。两道定位题内容满分，难题（FIND3）也指出片源没有目标镜头。认片题（FIND2）24 项对 23 项，不含速度 95.24 分，但有两份输入没有看帧记录，不能把内容分当成每一步检查都齐了。</p></div><div class="rr"><h3><a class="rl" href="../r/VO.html">口播精剪</a></h3><p data-k="t|sol62|role|VO">重录片头题（VO1）的保留区间表为空，得 0 分。第二题内容满分；两段录音难题（VO3）不含速度 93.59 分，算做成，但重复判断仍为不确定、处理待确认，正文完整性和音文核对均未过。达到做成线的草案也不能直接进片。</p></div><div class="rr"><h3><a class="rl" href="../r/CUT.html">口播配画面</a></h3><p data-k="t|sol62|role|CUT">两题都没做成。第一题（CUT1）五处选择对上三处，不含速度 52.00 分；长段讲解题（CUT3）七项对上两项，不含速度 28.57 分。强制要求都满足，具体选画面仍偏离最终可用成片，定稿应由人复核。</p></div><div class="rr"><h3><a class="rl" href="../r/TASTE.html">审美判断</a></h3><p data-k="t|sol62|role|TASTE">有规矩可查的题（TASTE1）20 处全对。没有规矩可查的题（TASTE2）15 处对上 10 处，不含速度 33.33 分，没达到做成线。可以让它照明确规矩执行，凭这道闭卷题还不能放心交审美定稿。</p></div><div class="rr"><h3><a class="rl" href="../r/QC.html">审片</a></h3><p data-k="t|sol62|role|QC">三题不含速度都是满分，含速度岗位分 99.88。声音和字幕题（QC2）交了字幕错位、无声和音量下降三类问题，位置与判分对上；细节题也找齐残留帧、重复画面和字幕错字。这批结果支持让它做审片初查，声音结论仍可抽查。</p></div><div class="rr"><h3><a class="rl" href="../r/FIX.html">改片</a></h3><p data-k="t|sol62|role|FIX">明确意见的两题内容满分。有歧义的题（FIX3）没有改配置，已请求确认，但候选只覆盖一种理解，不含速度 75.00 分，没做成。给它明确修改范围较合适，遇到指代不清的意见，要核对它有没有把另一种解释列全。</p></div><div class="rr"><h3><a class="rl" href="../r/SUB.html">字幕制作</a></h3><p data-k="t|sol62|role|SUB">前两题做成，不含速度分别为 98.93 和 100 分。原声字幕题（SUB3）按参考转写写正文，再用波形调整时间，却未核实转写是否对应当前音轨，不含速度只有 37.35 分。它说明没有听辨确认，诚实交代限制仍不能补上字幕内容的错误。</p></div></div></section></div><aside class="spec"><h2><span class="lb">测试规格</span></h2><dl><div class="sr"><dt><span class="lb">工具</span></dt><dd>Codex</dd></div><div class="sr"><dt><span class="lb">调用线路</span></dt><dd>Codex 订阅</dd></div><div class="sr"><dt><span class="lb">模型</span></dt><dd>gpt-6.2-sol</dd></div><div class="sr"><dt><span class="lb">思考档位</span></dt><dd>high</dd></div><div class="sr"><dt><span class="lb">加速模式</span></dt><dd><svg class="sw" viewBox="0 0 28 16" aria-hidden="true"><rect x=".75" y=".75" width="26.5" height="14.5" rx="7.25"/><circle cx="8" cy="8" r="4.2"/></svg></dd></div><div class="sr"><dt><span class="lb">输入类型</span></dt><dd><svg class="ic on" viewBox="0 0 16 16" aria-hidden="true"><path d="M3 3.5h10M8 3.5v9.5"/></svg><svg class="ic on" viewBox="0 0 16 16" aria-hidden="true"><rect x="1.8" y="2.8" width="12.4" height="10.4" rx="1.6"/><path d="m2.4 11.6 3.6-3.6 3 3 2-2 2.6 2.6"/><circle cx="10.6" cy="6" r="1.1"/></svg><svg class="ic" viewBox="0 0 16 16" aria-hidden="true"><rect x="1.4" y="3.8" width="9.2" height="8.4" rx="1.6"/><path d="m10.6 7 4-2.2v6.4l-4-2.2"/></svg></dd></div></dl></aside></div><section class="ds"><h2><span class="lb">岗位得分</span></h2><div class="pane on" data-pane-group="sv" data-pane="s"><div class="mrs"><div class="mr"><span class="ml"><a class="rl" href="../r/SORT.html">素材归类</a></span><span class="tt"><span class="tf" data-bar="role|SORT|sol62" style="--w:93.3%"></span></span><span class="tv" data-k="role|SORT|sol62">93.3</span><span class="rk"><svg class="hs" viewBox="0 0 10 10" aria-hidden="true"><path d="M3.9 1 2.9 9M7.1 1 6.1 9M1.3 3.7h7.6M.9 6.3h7.6"/></svg><span data-k="rk|role|SORT|sol62">4/19</span></span></div><div class="mr"><span class="ml"><a class="rl" href="../r/FIND.html">镜头查找与识别</a></span><span class="tt"><span class="tf" data-bar="role|FIND|sol62" style="--w:98.4%"></span></span><span class="tv" data-k="role|FIND|sol62">98.4</span><span class="rk"><svg class="hs" viewBox="0 0 10 10" aria-hidden="true"><path d="M3.9 1 2.9 9M7.1 1 6.1 9M1.3 3.7h7.6M.9 6.3h7.6"/></svg><span data-k="rk|role|FIND|sol62">3/19</span></span></div><div class="mr"><span class="ml"><a class="rl" href="../r/VO.html">口播精剪</a></span><span class="tt"><span class="tf" data-bar="role|VO|sol62" style="--w:64.4%"></span></span><span class="tv" data-k="role|VO|sol62">64.4</span><span class="rk"><svg class="hs" viewBox="0 0 10 10" aria-hidden="true"><path d="M3.9 1 2.9 9M7.1 1 6.1 9M1.3 3.7h7.6M.9 6.3h7.6"/></svg><span data-k="rk|role|VO|sol62">12/19</span></span></div><div class="mr"><span class="ml"><a class="rl" href="../r/CUT.html">口播配画面</a></span><span class="tt"><span class="tf" data-bar="role|CUT|sol62" style="--w:40.3%"></span></span><span class="tv" data-k="role|CUT|sol62">40.3</span><span class="rk"><svg class="hs" viewBox="0 0 10 10" aria-hidden="true"><path d="M3.9 1 2.9 9M7.1 1 6.1 9M1.3 3.7h7.6M.9 6.3h7.6"/></svg><span data-k="rk|role|CUT|sol62">7/19</span></span></div><div class="mr"><span class="ml"><a class="rl" href="../r/TASTE.html">审美判断</a></span><span class="tt"><span class="tf" data-bar="role|TASTE|sol62" style="--w:66.7%"></span></span><span class="tv" data-k="role|TASTE|sol62">66.7</span><span class="rk"><svg class="hs" viewBox="0 0 10 10" aria-hidden="true"><path d="M3.9 1 2.9 9M7.1 1 6.1 9M1.3 3.7h7.6M.9 6.3h7.6"/></svg><span data-k="rk|role|TASTE|sol62">5/19</span></span></div><div class="mr"><span class="ml"><a class="rl" href="../r/QC.html">审片</a></span><span class="tt"><span class="tf" data-bar="role|QC|sol62" style="--w:99.9%"></span></span><span class="tv" data-k="role|QC|sol62">99.9</span><span class="rk"><svg class="hs" viewBox="0 0 10 10" aria-hidden="true"><path d="M3.9 1 2.9 9M7.1 1 6.1 9M1.3 3.7h7.6M.9 6.3h7.6"/></svg><span data-k="rk|role|QC|sol62">2/19</span></span></div><div class="mr"><span class="ml"><a class="rl" href="../r/FIX.html">改片</a></span><span class="tt"><span class="tf" data-bar="role|FIX|sol62" style="--w:91.6%"></span></span><span class="tv" data-k="role|FIX|sol62">91.6</span><span class="rk"><svg class="hs" viewBox="0 0 10 10" aria-hidden="true"><path d="M3.9 1 2.9 9M7.1 1 6.1 9M1.3 3.7h7.6M.9 6.3h7.6"/></svg><span data-k="rk|role|FIX|sol62">8/19</span></span></div><div class="mr"><span class="ml"><a class="rl" href="../r/SUB.html">字幕制作</a></span><span class="tt"><span class="tf" data-bar="role|SUB|sol62" style="--w:78.6%"></span></span><span class="tv" data-k="role|SUB|sol62">78.6</span><span class="rk"><svg class="hs" viewBox="0 0 10 10" aria-hidden="true"><path d="M3.9 1 2.9 9M7.1 1 6.1 9M1.3 3.7h7.6M.9 6.3h7.6"/></svg><span data-k="rk|role|SUB|sol62">5/19</span></span></div></div></div><div class="pane" data-pane-group="sv" data-pane="n"><div class="mrs"><div class="mr"><span class="ml"><a class="rl" href="../r/SORT.html">素材归类</a></span><span class="tt"><span class="tf" data-bar="role0|SORT|sol62" style="--w:93.3%"></span></span><span class="tv" data-k="role0|SORT|sol62">93.3</span><span class="rk"><svg class="hs" viewBox="0 0 10 10" aria-hidden="true"><path d="M3.9 1 2.9 9M7.1 1 6.1 9M1.3 3.7h7.6M.9 6.3h7.6"/></svg><span data-k="rk|role0|SORT|sol62">4/19</span></span></div><div class="mr"><span class="ml"><a class="rl" href="../r/FIND.html">镜头查找与识别</a></span><span class="tt"><span class="tf" data-bar="role0|FIND|sol62" style="--w:98.4%"></span></span><span class="tv" data-k="role0|FIND|sol62">98.4</span><span class="rk"><svg class="hs" viewBox="0 0 10 10" aria-hidden="true"><path d="M3.9 1 2.9 9M7.1 1 6.1 9M1.3 3.7h7.6M.9 6.3h7.6"/></svg><span data-k="rk|role0|FIND|sol62">3/19</span></span></div><div class="mr"><span class="ml"><a class="rl" href="../r/VO.html">口播精剪</a></span><span class="tt"><span class="tf" data-bar="role0|VO|sol62" style="--w:64.5%"></span></span><span class="tv" data-k="role0|VO|sol62">64.5</span><span class="rk"><svg class="hs" viewBox="0 0 10 10" aria-hidden="true"><path d="M3.9 1 2.9 9M7.1 1 6.1 9M1.3 3.7h7.6M.9 6.3h7.6"/></svg><span data-k="rk|role0|VO|sol62">15/19</span></span></div><div class="mr"><span class="ml"><a class="rl" href="../r/CUT.html">口播配画面</a></span><span class="tt"><span class="tf" data-bar="role0|CUT|sol62" style="--w:40.3%"></span></span><span class="tv" data-k="role0|CUT|sol62">40.3</span><span class="rk"><svg class="hs" viewBox="0 0 10 10" aria-hidden="true"><path d="M3.9 1 2.9 9M7.1 1 6.1 9M1.3 3.7h7.6M.9 6.3h7.6"/></svg><span data-k="rk|role0|CUT|sol62">3/19</span></span></div><div class="mr"><span class="ml"><a class="rl" href="../r/TASTE.html">审美判断</a></span><span class="tt"><span class="tf" data-bar="role0|TASTE|sol62" style="--w:66.7%"></span></span><span class="tv" data-k="role0|TASTE|sol62">66.7</span><span class="rk"><svg class="hs" viewBox="0 0 10 10" aria-hidden="true"><path d="M3.9 1 2.9 9M7.1 1 6.1 9M1.3 3.7h7.6M.9 6.3h7.6"/></svg><span data-k="rk|role0|TASTE|sol62">3/19</span></span></div><div class="mr"><span class="ml"><a class="rl" href="../r/QC.html">审片</a></span><span class="tt"><span class="tf" data-bar="role0|QC|sol62" style="--w:100.0%"></span></span><span class="tv" data-k="role0|QC|sol62">100.0</span><span class="rk"><svg class="hs" viewBox="0 0 10 10" aria-hidden="true"><path d="M3.9 1 2.9 9M7.1 1 6.1 9M1.3 3.7h7.6M.9 6.3h7.6"/></svg><span data-k="rk|role0|QC|sol62">1/19</span></span></div><div class="mr"><span class="ml"><a class="rl" href="../r/FIX.html">改片</a></span><span class="tt"><span class="tf" data-bar="role0|FIX|sol62" style="--w:91.7%"></span></span><span class="tv" data-k="role0|FIX|sol62">91.7</span><span class="rk"><svg class="hs" viewBox="0 0 10 10" aria-hidden="true"><path d="M3.9 1 2.9 9M7.1 1 6.1 9M1.3 3.7h7.6M.9 6.3h7.6"/></svg><span data-k="rk|role0|FIX|sol62">2/19</span></span></div><div class="mr"><span class="ml"><a class="rl" href="../r/SUB.html">字幕制作</a></span><span class="tt"><span class="tf" data-bar="role0|SUB|sol62" style="--w:78.8%"></span></span><span class="tv" data-k="role0|SUB|sol62">78.8</span><span class="rk"><svg class="hs" viewBox="0 0 10 10" aria-hidden="true"><path d="M3.9 1 2.9 9M7.1 1 6.1 9M1.3 3.7h7.6M.9 6.3h7.6"/></svg><span data-k="rk|role0|SUB|sol62">6/19</span></span></div></div></div></section><section class="ds"><h2><span class="lb">逐题得分</span></h2><div class="pane on" data-pane-group="sv" data-pane="s"><div class="tgrid"><div class="tb"><h3><a class="rl" href="../r/SORT.html">素材归类</a></h3><div class="tr"><span class="ti">录音分组排序</span><span class="tt"><span class="tf" data-bar="run|sol62|SORT1" style="--w:100.0%"></span></span><span class="tv" data-k="run|sol62|SORT1">100.0</span></div><div class="tr"><span class="ti">短视频素材登记</span><span class="tt"><span class="tf" data-bar="run|sol62|SORT2" style="--w:100.0%"></span></span><span class="tv" data-k="run|sol62|SORT2">100.0</span></div><div class="tr"><span class="ti">电影片段登记查重</span><span class="tt"><span class="tf" data-bar="run|sol62|SORT3" style="--w:80.0%"></span></span><span class="tv" data-k="run|sol62|SORT3">80.0</span></div></div><div class="tb"><h3><a class="rl" href="../r/FIND.html">镜头查找与识别</a></h3><div class="tr"><span class="ti">按描述找镜头</span><span class="tt"><span class="tf" data-bar="run|sol62|FIND1" style="--w:100.0%"></span></span><span class="tv" data-k="run|sol62|FIND1">100.0</span></div><div class="tr"><span class="ti">认电影和人物</span><span class="tt"><span class="tf" data-bar="run|sol62|FIND2" style="--w:95.2%"></span></span><span class="tv" data-k="run|sol62|FIND2">95.2</span></div><div class="tr"><span class="ti">找镜头并核对线索</span><span class="tt"><span class="tf" data-bar="run|sol62|FIND3" style="--w:100.0%"></span></span><span class="tv" data-k="run|sol62|FIND3">100.0</span></div></div><div class="tb"><h3><a class="rl" href="../r/VO.html">口播精剪</a></h3><div class="tr"><span class="ti">整理重说的开场白</span><span class="tt"><span class="tf" data-bar="run|sol62|VO1" style="--w:0.0%"></span></span><span class="tv" data-k="run|sol62|VO1">0.0</span></div><div class="tr"><span class="ti">按要求整理一整段口播</span><span class="tt"><span class="tf" data-bar="run|sol62|VO2" style="--w:99.8%"></span></span><span class="tv" data-k="run|sol62|VO2">99.8</span></div><div class="tr"><span class="ti">核对录音和转写文字</span><span class="tt"><span class="tf" data-bar="run|sol62|VO3" style="--w:93.3%"></span></span><span class="tv" data-k="run|sol62|VO3">93.3</span></div></div><div class="tb"><h3><a class="rl" href="../r/CUT.html">口播配画面</a></h3><div class="tr"><span class="ti">给五处讲解挑画面</span><span class="tt"><span class="tf" data-bar="run|sol62|CUT1" style="--w:52.0%"></span></span><span class="tv" data-k="run|sol62|CUT1">52.0</span></div><div class="tr"><span class="ti">按限制给长段讲解配画面</span><span class="tt"><span class="tf" data-bar="run|sol62|CUT3" style="--w:28.6%"></span></span><span class="tv" data-k="run|sol62|CUT3">28.6</span></div></div><div class="tb"><h3><a class="rl" href="../r/TASTE.html">审美判断</a></h3><div class="tr"><span class="ti">照规矩选剪法</span><span class="tt"><span class="tf" data-bar="run|sol62|TASTE1" style="--w:100.0%"></span></span><span class="tv" data-k="run|sol62|TASTE1">100.0</span></div><div class="tr"><span class="ti">凭判断选剪法</span><span class="tt"><span class="tf" data-bar="run|sol62|TASTE2" style="--w:33.3%"></span></span><span class="tv" data-k="run|sol62|TASTE2">33.3</span></div><div class="tr"><span class="ti">看片挑起止点</span><span class="tt"><span class="tf" data-bar="run|sol62|TASTE3" style="--w:55.6%"></span></span><span class="tv" data-k="run|sol62|TASTE3">55.6</span></div></div><div class="tb"><h3><a class="rl" href="../r/QC.html">审片</a></h3><div class="tr"><span class="ti">查画面硬伤</span><span class="tt"><span class="tf" data-bar="run|sol62|QC1" style="--w:99.8%"></span></span><span class="tv" data-k="run|sol62|QC1">99.8</span></div><div class="tr"><span class="ti">查声音和字幕</span><span class="tt"><span class="tf" data-bar="run|sol62|QC2" style="--w:99.9%"></span></span><span class="tv" data-k="run|sol62|QC2">99.9</span></div><div class="tr"><span class="ti">查细小剪辑问题</span><span class="tt"><span class="tf" data-bar="run|sol62|QC3" style="--w:99.9%"></span></span><span class="tv" data-k="run|sol62|QC3">99.9</span></div></div><div class="tb"><h3><a class="rl" href="../r/FIX.html">改片</a></h3><div class="tr"><span class="ti">照三条明确意见改</span><span class="tt"><span class="tf" data-bar="run|sol62|FIX1" style="--w:100.0%"></span></span><span class="tv" data-k="run|sol62|FIX1">100.0</span></div><div class="tr"><span class="ti">只改指定部分</span><span class="tt"><span class="tf" data-bar="run|sol62|FIX2" style="--w:100.0%"></span></span><span class="tv" data-k="run|sol62|FIX2">100.0</span></div><div class="tr"><span class="ti">核对意见指的是哪里</span><span class="tt"><span class="tf" data-bar="run|sol62|FIX3" style="--w:75.0%"></span></span><span class="tv" data-k="run|sol62|FIX3">75.0</span></div></div><div class="tb"><h3><a class="rl" href="../r/SUB.html">字幕制作</a></h3><div class="tr"><span class="ti">口播字幕校对</span><span class="tt"><span class="tf" data-bar="run|sol62|SUB1" style="--w:98.9%"></span></span><span class="tv" data-k="run|sol62|SUB1">98.9</span></div><div class="tr"><span class="ti">字幕校对与摆位</span><span class="tt"><span class="tf" data-bar="run|sol62|SUB2" style="--w:99.9%"></span></span><span class="tv" data-k="run|sol62|SUB2">99.9</span></div><div class="tr"><span class="ti">按片段实际声音配字幕</span><span class="tt"><span class="tf" data-bar="run|sol62|SUB3" style="--w:37.1%"></span></span><span class="tv" data-k="run|sol62|SUB3">37.1</span></div></div></div></div><div class="pane" data-pane-group="sv" data-pane="n"><div class="tgrid"><div class="tb"><h3><a class="rl" href="../r/SORT.html">素材归类</a></h3><div class="tr"><span class="ti">录音分组排序</span><span class="tt"><span class="tf" data-bar="run0|sol62|SORT1" style="--w:100.0%"></span></span><span class="tv" data-k="run0|sol62|SORT1">100.0</span></div><div class="tr"><span class="ti">短视频素材登记</span><span class="tt"><span class="tf" data-bar="run0|sol62|SORT2" style="--w:100.0%"></span></span><span class="tv" data-k="run0|sol62|SORT2">100.0</span></div><div class="tr"><span class="ti">电影片段登记查重</span><span class="tt"><span class="tf" data-bar="run0|sol62|SORT3" style="--w:80.0%"></span></span><span class="tv" data-k="run0|sol62|SORT3">80.0</span></div></div><div class="tb"><h3><a class="rl" href="../r/FIND.html">镜头查找与识别</a></h3><div class="tr"><span class="ti">按描述找镜头</span><span class="tt"><span class="tf" data-bar="run0|sol62|FIND1" style="--w:100.0%"></span></span><span class="tv" data-k="run0|sol62|FIND1">100.0</span></div><div class="tr"><span class="ti">认电影和人物</span><span class="tt"><span class="tf" data-bar="run0|sol62|FIND2" style="--w:95.2%"></span></span><span class="tv" data-k="run0|sol62|FIND2">95.2</span></div><div class="tr"><span class="ti">找镜头并核对线索</span><span class="tt"><span class="tf" data-bar="run0|sol62|FIND3" style="--w:100.0%"></span></span><span class="tv" data-k="run0|sol62|FIND3">100.0</span></div></div><div class="tb"><h3><a class="rl" href="../r/VO.html">口播精剪</a></h3><div class="tr"><span class="ti">整理重说的开场白</span><span class="tt"><span class="tf" data-bar="run0|sol62|VO1" style="--w:0.0%"></span></span><span class="tv" data-k="run0|sol62|VO1">0.0</span></div><div class="tr"><span class="ti">按要求整理一整段口播</span><span class="tt"><span class="tf" data-bar="run0|sol62|VO2" style="--w:100.0%"></span></span><span class="tv" data-k="run0|sol62|VO2">100.0</span></div><div class="tr"><span class="ti">核对录音和转写文字</span><span class="tt"><span class="tf" data-bar="run0|sol62|VO3" style="--w:93.6%"></span></span><span class="tv" data-k="run0|sol62|VO3">93.6</span></div></div><div class="tb"><h3><a class="rl" href="../r/CUT.html">口播配画面</a></h3><div class="tr"><span class="ti">给五处讲解挑画面</span><span class="tt"><span class="tf" data-bar="run0|sol62|CUT1" style="--w:52.0%"></span></span><span class="tv" data-k="run0|sol62|CUT1">52.0</span></div><div class="tr"><span class="ti">按限制给长段讲解配画面</span><span class="tt"><span class="tf" data-bar="run0|sol62|CUT3" style="--w:28.6%"></span></span><span class="tv" data-k="run0|sol62|CUT3">28.6</span></div></div><div class="tb"><h3><a class="rl" href="../r/TASTE.html">审美判断</a></h3><div class="tr"><span class="ti">照规矩选剪法</span><span class="tt"><span class="tf" data-bar="run0|sol62|TASTE1" style="--w:100.0%"></span></span><span class="tv" data-k="run0|sol62|TASTE1">100.0</span></div><div class="tr"><span class="ti">凭判断选剪法</span><span class="tt"><span class="tf" data-bar="run0|sol62|TASTE2" style="--w:33.3%"></span></span><span class="tv" data-k="run0|sol62|TASTE2">33.3</span></div><div class="tr"><span class="ti">看片挑起止点</span><span class="tt"><span class="tf" data-bar="run0|sol62|TASTE3" style="--w:55.6%"></span></span><span class="tv" data-k="run0|sol62|TASTE3">55.6</span></div></div><div class="tb"><h3><a class="rl" href="../r/QC.html">审片</a></h3><div class="tr"><span class="ti">查画面硬伤</span><span class="tt"><span class="tf" data-bar="run0|sol62|QC1" style="--w:100.0%"></span></span><span class="tv" data-k="run0|sol62|QC1">100.0</span></div><div class="tr"><span class="ti">查声音和字幕</span><span class="tt"><span class="tf" data-bar="run0|sol62|QC2" style="--w:100.0%"></span></span><span class="tv" data-k="run0|sol62|QC2">100.0</span></div><div class="tr"><span class="ti">查细小剪辑问题</span><span class="tt"><span class="tf" data-bar="run0|sol62|QC3" style="--w:100.0%"></span></span><span class="tv" data-k="run0|sol62|QC3">100.0</span></div></div><div class="tb"><h3><a class="rl" href="../r/FIX.html">改片</a></h3><div class="tr"><span class="ti">照三条明确意见改</span><span class="tt"><span class="tf" data-bar="run0|sol62|FIX1" style="--w:100.0%"></span></span><span class="tv" data-k="run0|sol62|FIX1">100.0</span></div><div class="tr"><span class="ti">只改指定部分</span><span class="tt"><span class="tf" data-bar="run0|sol62|FIX2" style="--w:100.0%"></span></span><span class="tv" data-k="run0|sol62|FIX2">100.0</span></div><div class="tr"><span class="ti">核对意见指的是哪里</span><span class="tt"><span class="tf" data-bar="run0|sol62|FIX3" style="--w:75.0%"></span></span><span class="tv" data-k="run0|sol62|FIX3">75.0</span></div></div><div class="tb"><h3><a class="rl" href="../r/SUB.html">字幕制作</a></h3><div class="tr"><span class="ti">口播字幕校对</span><span class="tt"><span class="tf" data-bar="run0|sol62|SUB1" style="--w:98.9%"></span></span><span class="tv" data-k="run0|sol62|SUB1">98.9</span></div><div class="tr"><span class="ti">字幕校对与摆位</span><span class="tt"><span class="tf" data-bar="run0|sol62|SUB2" style="--w:100.0%"></span></span><span class="tv" data-k="run0|sol62|SUB2">100.0</span></div><div class="tr"><span class="ti">按片段实际声音配字幕</span><span class="tt"><span class="tf" data-bar="run0|sol62|SUB3" style="--w:37.3%"></span></span><span class="tv" data-k="run0|sol62|SUB3">37.3</span></div></div></div></div></section><section class="ds ds-speed"><h2><span class="lb">速度测试</span></h2><div class="mrs"><div class="mr"><span class="ml"><span class="lb">首句正文等待中位数</span><sup class="st">*</sup></span><span class="tt"><span class="tf" data-bar="sm|first_text_s|sol62" style="--w:77.4%"></span></span><span class="tv" data-k="sm|first_text_s|sol62">6.7s</span><span class="rk"><svg class="hs" viewBox="0 0 10 10" aria-hidden="true"><path d="M3.9 1 2.9 9M7.1 1 6.1 9M1.3 3.7h7.6M.9 6.3h7.6"/></svg><span data-k="rk|sm|first_text_s|sol62">2/19</span></span></div><div class="mr"><span class="ml"><span class="lb">首个动作等待中位数</span><sup class="st">*</sup></span><span class="tt"><span class="tf" data-bar="sm|first_event_s|sol62" style="--w:36.9%"></span></span><span class="tv" data-k="sm|first_event_s|sol62">6.7s</span><span class="rk"><svg class="hs" viewBox="0 0 10 10" aria-hidden="true"><path d="M3.9 1 2.9 9M7.1 1 6.1 9M1.3 3.7h7.6M.9 6.3h7.6"/></svg><span data-k="rk|sm|first_event_s|sol62">9/19</span></span></div><div class="mr"><span class="ml"><span class="lb">token 产出率中位数</span><sup class="st">*</sup></span><span class="tt"><span class="tf" data-bar="sm|output_rate_tokens_per_s|sol62" style="--w:15.6%"></span></span><span class="tv" data-k="sm|output_rate_tokens_per_s|sol62">25.0/s</span><span class="rk"><svg class="hs" viewBox="0 0 10 10" aria-hidden="true"><path d="M3.9 1 2.9 9M7.1 1 6.1 9M1.3 3.7h7.6M.9 6.3h7.6"/></svg><span data-k="rk|sm|output_rate_tokens_per_s|sol62">16/17</span></span></div><div class="mr"><span class="ml"><span class="lb">正文输出速度中位数</span><sup class="st">*</sup></span><span class="tt"><span class="tf" data-bar="sm|output_rate_chars_per_s|sol62" style="--w:52.0%"></span></span><span class="tv" data-k="sm|output_rate_chars_per_s|sol62">21.8/s</span><span class="rk"><svg class="hs" viewBox="0 0 10 10" aria-hidden="true"><path d="M3.9 1 2.9 9M7.1 1 6.1 9M1.3 3.7h7.6M.9 6.3h7.6"/></svg><span data-k="rk|sm|output_rate_chars_per_s|sol62">10/17</span></span></div><div class="mr"><span class="ml"><span class="lb">逐段输出速度中位数</span><sup class="st">*</sup></span><span class="tt"><span class="tf" data-bar="sm|stream_chars_per_s|sol62" style="--w:7.8%"></span></span><span class="tv" data-k="sm|stream_chars_per_s|sol62">42.9/s</span><span class="rk"><svg class="hs" viewBox="0 0 10 10" aria-hidden="true"><path d="M3.9 1 2.9 9M7.1 1 6.1 9M1.3 3.7h7.6M.9 6.3h7.6"/></svg><span data-k="rk|sm|stream_chars_per_s|sol62">12/12</span></span></div><div class="mr"><span class="ml"><span class="lb">工具往返用时中位数</span><sup class="st">*</sup></span><span class="tt"><span class="tf" data-bar="sm|per_roundtrip_s|sol62" style="--w:39.0%"></span></span><span class="tv" data-k="sm|per_roundtrip_s|sol62">4.7s</span><span class="rk"><svg class="hs" viewBox="0 0 10 10" aria-hidden="true"><path d="M3.9 1 2.9 9M7.1 1 6.1 9M1.3 3.7h7.6M.9 6.3h7.6"/></svg><span data-k="rk|sm|per_roundtrip_s|sol62">11/17</span></span></div><div class="mr"><span class="ml"><span class="lb">小测总用时中位数</span><sup class="st">*</sup></span><span class="tt"><span class="tf" data-bar="sm|total_s|sol62" style="--w:54.7%"></span></span><span class="tv" data-k="sm|total_s|sol62">13.6s</span><span class="rk"><svg class="hs" viewBox="0 0 10 10" aria-hidden="true"><path d="M3.9 1 2.9 9M7.1 1 6.1 9M1.3 3.7h7.6M.9 6.3h7.6"/></svg><span data-k="rk|sm|total_s|sol62">7/19</span></span></div><div class="mr"><span class="ml"><span class="lb">模型用时中位数</span><sup class="st">*</sup></span><span class="tt"><span class="tf" data-bar="sm|model_s|sol62" style="--w:53.9%"></span></span><span class="tv" data-k="sm|model_s|sol62">13.4s</span><span class="rk"><svg class="hs" viewBox="0 0 10 10" aria-hidden="true"><path d="M3.9 1 2.9 9M7.1 1 6.1 9M1.3 3.7h7.6M.9 6.3h7.6"/></svg><span data-k="rk|sm|model_s|sol62">9/19</span></span></div><div class="mr"><span class="ml"><span class="lb">启动用时中位数</span><sup class="st">*</sup></span><span class="tt"><span class="tf" data-bar="sm|startup_s|sol62" style="--w:19.7%"></span></span><span class="tv" data-k="sm|startup_s|sol62">0.1s</span><span class="rk"><svg class="hs" viewBox="0 0 10 10" aria-hidden="true"><path d="M3.9 1 2.9 9M7.1 1 6.1 9M1.3 3.7h7.6M.9 6.3h7.6"/></svg><span data-k="rk|sm|startup_s|sol62">8/19</span></span></div><div class="mr"><span class="ml"><span class="lb">小测正确次数</span></span><span class="tt"><span class="tf" data-bar="sm|correct|sol62" style="--w:100.0%"></span></span><span class="tv" data-k="sm|correct|sol62">15/15</span><span class="rk"><svg class="hs" viewBox="0 0 10 10" aria-hidden="true"><path d="M3.9 1 2.9 9M7.1 1 6.1 9M1.3 3.7h7.6M.9 6.3h7.6"/></svg><span data-k="rk|sm|correct|sol62">1/19</span></span></div></div></section><section class="ds dl2"><h2><span class="lb">谎报题数</span></h2><span class="ln" data-k="lie|sol62">0</span><span class="chips"></span></section><p class="note"><sup class="st">*</sup><span class="lb">该数据仅供参考，实际使用时会受时间段、同时使用人数、网络和服务商负载等因素影响。</span></p></main><div id="sol62-tip" class="mark-tip" role="tooltip" hidden><span class="lb">首轮尝试打印音频数据试听，5题因通道不支持音频输入而报错终止。重考及余题仅该模型题面加注&quot;音频不受支持&quot;。</span></div>
+<script>
+(()=>{
+const $$=(s,r=document)=>[...r.querySelectorAll(s)];
+const hide=document.getElementById('hide');
+let active=null, pinned=false;
+function closeTip(){$$('.mark-tip').forEach(t=>t.hidden=true);active=null;pinned=false}
+function showTip(mark){
+  const tip=document.getElementById(mark.getAttribute('aria-describedby'));
+  if(!tip)return;
+  $$('.mark-tip').forEach(t=>t.hidden=t!==tip);
+  active=mark;
+  const r=mark.getBoundingClientRect(), t=tip.getBoundingClientRect();
+  tip.style.left=Math.max(12,Math.min(innerWidth-t.width-12,r.left+r.width/2-t.width/2))+'px';
+  tip.style.top=Math.max(12,Math.min(innerHeight-t.height-12,r.bottom+t.height+8>innerHeight?r.top-t.height-8:r.bottom+8))+'px';
+}
+document.addEventListener('pointerover',e=>{const m=e.target.closest('[data-audit]');if(m&&e.pointerType!=='touch')showTip(m)});
+document.addEventListener('pointerout',e=>{if(e.target.closest('[data-audit]')&&!pinned)closeTip()});
+document.addEventListener('focusin',e=>{if(e.target.matches('[data-audit]'))showTip(e.target)});
+document.addEventListener('focusout',e=>{if(e.target.matches('[data-audit]'))closeTip()});
+document.addEventListener('click',e=>{
+  const m=e.target.closest('[data-audit]');
+  if(m){e.preventDefault();e.stopPropagation();if(active===m&&pinned)closeTip();else{showTip(m);pinned=true}}
+  else closeTip();
+},true);
+document.addEventListener('keydown',e=>{
+  if(e.key==='Escape')closeTip();
+  if(e.target.matches('[data-audit]')&&(e.key==='Enter'||e.key===' ')){e.preventDefault();showTip(e.target);pinned=true}
+});
+window.addEventListener('resize',closeTip);
+window.addEventListener('scroll',()=>{if(active)showTip(active)},true);
+function apply(){
+  const off=$$('[data-toggle].off').map(b=>b.dataset.toggle);
+  hide.textContent=off.length?off.map(i=>`.chart [data-m="${i}"]`).join(',')+'{display:none!important}':'';
+}
+document.addEventListener('click',e=>{
+  const t=e.target.closest('[data-tab]');
+  if(t){
+    const g=t.dataset.group;
+    $$(`[data-group="${g}"]`).forEach(b=>b.classList.toggle('on',b===t));
+    $$(`[data-pane-group="${g}"]`).forEach(p=>p.classList.toggle('on',p.dataset.pane===t.dataset.tab));
+    return;
+  }
+  const s=e.target.closest('[data-scale]');
+  if(s){
+    const sec=s.closest('section');
+    $$('[data-scale]',sec).forEach(b=>b.classList.toggle('on',b===s));
+    $$('.sc',sec).forEach(c=>{c.classList.toggle('lin',s.dataset.scale==='lin');c.classList.toggle('log',s.dataset.scale==='log')});
+    return;
+  }
+  const m=e.target.closest('[data-toggle]');
+  if(m){m.classList.toggle('off');apply();return}
+  if(e.target.closest('[data-reset]')){$$('[data-toggle]').forEach(b=>b.classList.remove('off'));apply();return}
+  const sd=e.target.closest('[data-side]');
+  if(sd){sd.closest('.side').classList.toggle('open')}
+});
+document.addEventListener('change',e=>{
+  if(e.target.matches('[data-pareto]')){
+    $$('.sc',e.target.closest('section')).forEach(c=>c.classList.toggle('pareto',e.target.checked));
+  }
+});
+})();
+</script>
+</body>
+</html>

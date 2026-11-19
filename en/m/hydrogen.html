@@ -1,0 +1,460 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="description" content="Overall score, role scores, task scores, and times for Gemini 4 Hydrogen (xhigh) on the video editing benchmark."><meta property="og:type" content="website"><meta property="og:site_name" content="VideoBench"><meta property="og:title" content="Gemini 4 Hydrogen (xhigh)&#x27;s video editing results"><meta property="og:description" content="Overall score, role scores, task scores, and times for Gemini 4 Hydrogen (xhigh) on the video editing benchmark."><meta property="og:url" content="https://huaiyuan-jiang.github.io/videobench/en/m/hydrogen.html"><meta property="og:image" content="https://huaiyuan-jiang.github.io/videobench/en/card.png"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="Gemini 4 Hydrogen (xhigh)&#x27;s video editing results"><meta name="twitter:description" content="Overall score, role scores, task scores, and times for Gemini 4 Hydrogen (xhigh) on the video editing benchmark."><meta name="twitter:image" content="https://huaiyuan-jiang.github.io/videobench/en/card.png">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#000000">
+<title>Gemini 4 Hydrogen (xhigh)</title>
+<style>
+@import url(fonts.css);
+:root{
+  --bg:#000;
+  --fg:#EDE8E3;
+  --mute:#9A938C;
+  --dim:#5F5953;
+  --line:#1F1D1B;
+  --grid:#2A2725;
+  --track:#141312;
+  --accent:#C5AC98;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:64px}
+body{margin:0;background:var(--bg);color:var(--fg);font:400 13px/1.45 "VBL","VBC",system-ui,"Microsoft YaHei",sans-serif;
+  font-variant-numeric:tabular-nums;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:pointer}
+button:focus-visible,a:focus-visible,input:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+h2,h3{margin:0;font-weight:500}
+.lb:empty{display:inline-block;min-width:1.5em}
+.st{margin-left:1px;font-size:.85em;line-height:0;font-weight:400;color:var(--mute)}
+.note{margin:30px 0 0;font-size:11.5px;line-height:1.6;color:var(--dim)}
+.nm,.sn>a{position:relative}
+.nm .lo,.sn .lo{position:absolute;right:calc(100% + 4px);top:50%;transform:translateY(-50%);width:15px;height:15px;background-size:12px;border-radius:3px}
+.sn>a{margin-left:1px}
+.audit-tail{font:inherit;white-space:nowrap;position:relative}
+.audit-mark{display:inline-block;font-size:.8em;line-height:1;color:var(--mute);cursor:help;position:absolute;left:100%;top:-.3em;padding:0 2px;white-space:nowrap}
+.vn .audit-mark{position:static}
+.mark-tip{position:fixed;z-index:100;max-width:min(340px,calc(100vw - 24px));padding:12px 14px;border:1px solid var(--grid);border-radius:6px;background:#201D1A;color:var(--fg);font-size:12px;line-height:1.65;box-shadow:0 4px 20px #0008;pointer-events:none}
+.note .st{margin:0 3px 0 0;color:inherit}
+.rl{color:inherit;text-decoration:none}.rl:hover{text-decoration:underline}
+
+/* 顶栏 */
+.top{position:sticky;top:0;z-index:10;height:58px;display:flex;align-items:center;gap:36px;padding:0 28px;
+  background:var(--bg);border-bottom:1px solid var(--line)}
+.mark{font-size:20px;font-weight:600;letter-spacing:-.02em;color:var(--fg);text-decoration:none}
+.top nav{display:flex;gap:24px;align-self:stretch;padding-left:36px;border-left:1px solid var(--line)}
+.top nav a{display:flex;align-items:center;color:var(--mute);text-decoration:none;font-size:14px;border-bottom:2px solid transparent}
+.top nav a:hover{color:var(--fg);border-bottom-color:var(--accent)}
+.top .lang{margin-left:auto;color:var(--mute);text-decoration:none;font-size:13px}.top .lang:hover{color:var(--fg)}
+
+/* 主体 + 侧栏 */
+.wrap{display:grid;grid-template-columns:minmax(0,1fr) 256px}
+main{min-width:0;padding:0 28px 60px}
+.side{border-left:1px solid var(--line)}
+.side-in{position:sticky;top:58px;padding:24px 20px}
+.side-toggle{display:none}
+.sh{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.sh h2{font-size:16px}
+.sh h2 b,.side-toggle b{margin-left:8px;font-weight:400;color:var(--dim);font-size:13px}
+.reset{color:var(--mute);display:flex;padding:4px}
+.reset:hover{color:var(--fg)}
+.side ul{list-style:none;margin:0;padding:0}
+.side li{display:flex;align-items:center;gap:8px}
+.mn{flex:1;min-width:0;display:flex;align-items:center;gap:9px;padding:6px 0;font-size:14px;color:var(--fg);text-decoration:none}
+.mn span{line-height:1.3}
+a.mn:hover span{color:#fff;text-decoration:underline}
+.mt{flex:none;display:flex;padding:10px 4px 10px 14px}
+.mt i{width:9px;height:9px;border-radius:50%;background:var(--c);border:1.5px solid var(--c)}
+.mt.off i{background:transparent}
+.side li:has(.off) .mn{color:var(--dim)}
+.side li:has(.off) .lo{opacity:.35}
+
+/* 厂商 logo：深色小底块，只有有文件的 key 才显示 */
+.lo{display:none;flex:none;width:20px;height:20px;border-radius:5px;background:#1E1C1A center/15px no-repeat;
+  box-shadow:inset 0 0 0 1px #2E2B28}
+.lo[data-v="alibaba"],.lo[data-v="minimax"]{background-color:#EDE8E3}
+
+/* 面板 */
+.panel{padding:30px 0 34px;border-top:1px solid var(--line)}
+.ph{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px 20px;margin-bottom:20px}
+.ph h2,.card h2{font-size:17px;letter-spacing:-.01em}
+.pane:not(.on){display:none}
+.tabs{display:flex;flex-wrap:wrap;gap:4px 22px}
+.tab{padding:6px 0 7px;font-size:14.5px;color:var(--mute);border-bottom:2px solid transparent}
+.tab:hover{color:var(--fg)}
+.tab.on{color:var(--fg);border-bottom-color:var(--accent)}
+.tabs.sub{gap:2px 16px;margin:14px 0 22px}
+.tab.sm{font-size:12.5px;padding:3px 0 4px}
+#speed>.tabs{padding-bottom:2px;border-bottom:1px solid var(--line)}
+.ctl{display:flex;align-items:center;gap:22px;font-size:13px}
+.chk{display:flex;align-items:center;gap:8px;color:var(--fg);cursor:pointer}
+.chk input{appearance:none;width:13px;height:13px;margin:0;border:1px solid var(--mute);border-radius:2px;display:grid;place-content:center}
+.chk input:checked{background:var(--accent);border-color:var(--accent)}
+.seg{display:flex;gap:14px}
+.sb{color:var(--dim);padding:3px 0;border-bottom:1px solid transparent}
+.sb.on{color:var(--fg);border-bottom-color:var(--fg)}
+
+/* 首屏：大竖柱 + 下面两张 */
+.hero{margin:0 -28px;border-bottom:1px solid var(--line)}
+.card.big{border-right:0;border-bottom:1px solid var(--line);padding-bottom:12px}
+.vbars{--h:340px;position:relative;display:flex;gap:0 12px;padding:14px 4px 0 64px}
+.vg{position:absolute;left:0;right:0;top:calc(14px + var(--h) * (1 - var(--y)));border-top:1px dashed var(--grid)}
+.vb{flex:1 1 0;min-width:0;display:flex;flex-direction:column;align-items:center;color:var(--fg);text-decoration:none;position:relative}
+.vt{width:100%;height:var(--h);display:flex;align-items:flex-end;justify-content:center;border-bottom:1px solid var(--grid)}
+.vf{position:relative;width:min(100%,52px);height:calc(var(--w) * var(--k));background:var(--c);border-radius:3px 3px 0 0}
+.vv{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);font-size:14px;font-weight:600;color:var(--t);white-space:nowrap}
+.vb .lo{margin:10px 0 0}
+.vn{position:relative;width:100%;height:150px}
+.vn span{position:absolute;right:50%;top:8px;transform-origin:100% 50%;transform:rotate(-45deg);width:9.5em;text-align:right;line-height:1.2;font-size:13px;color:var(--fg)}
+a.vb:hover .vf{filter:brightness(1.15)}
+a.vb:hover .vn span{color:#fff;text-decoration:underline}
+
+.card{padding:26px 28px 24px;border-right:1px solid var(--line);min-width:0}
+.card:last-child{border-right:0}
+.card h2{margin-bottom:18px}
+.key{display:flex;flex-wrap:wrap;gap:4px 16px;margin-top:14px;color:var(--mute);font-size:12px}
+.key span{display:flex;align-items:center;gap:6px}
+.key i{width:10px;height:10px;border-radius:2px;background:var(--fg)}
+.key .kc{background:#6E6A66}
+.key .ko{background:var(--accent)}
+
+/* 柱子：宽屏竖着，窄屏和 .h 横着 */
+.bars{display:flex;gap:0 6px;padding-top:22px}
+.b{flex:1 1 0;display:flex;flex-direction:column;min-width:0}
+.tk{height:230px;display:flex;align-items:flex-end;justify-content:center;border-bottom:1px solid var(--grid)}
+.fl{position:relative;width:min(72%,46px);height:var(--w);min-height:1px;background:var(--c);border-radius:3px 3px 0 0}
+.sg{position:absolute;left:0;right:0;bottom:0;height:var(--w);background:rgba(0,0,0,.5)}
+.v{position:absolute;left:50%;bottom:100%;transform:translateX(-50%);margin-bottom:5px;white-space:nowrap;font-size:12px;font-weight:500;color:var(--fg)}
+.nm{margin-top:9px;text-align:center;font-size:12px;line-height:1.25;color:var(--c);overflow-wrap:anywhere}
+@media (min-width:1101px){.bars:not(.h) .nm .lo{position:static;transform:none;margin:0 auto 5px}}
+
+.bars.h{display:flex;flex-direction:column;gap:4px;padding-top:0}
+.bars.h .b{display:grid;padding-left:19px;grid-template-columns:216px minmax(0,1fr);align-items:center;column-gap:10px}
+.bars.h .nm{order:-1;margin:0;text-align:left;font-size:12.5px}
+.bars.h .tk{height:15px;display:block;padding-right:54px;border:0}
+.bars.h .fl{width:var(--w);height:100%;border-radius:0 2px 2px 0}
+.bars.h .sg{top:0;bottom:0;right:auto;height:auto;width:var(--w)}
+.bars.h .so{position:absolute;top:0;bottom:0;right:0;width:var(--w);min-width:2px;background:var(--accent)}
+.bars.h .v{left:100%;bottom:auto;top:50%;transform:translateY(-50%);margin:0 0 0 7px}
+
+/* 散点 */
+.sc{display:grid;grid-template-columns:20px minmax(0,1fr);grid-template-rows:auto auto}
+.sc.on{display:grid}
+.sc-y{grid-row:1;writing-mode:vertical-rl;text-align:center;color:var(--mute);font-size:12.5px;padding-bottom:30px}
+.sc-body{display:grid;grid-template-columns:minmax(0,1fr) 220px;height:470px}
+.plot{position:relative;margin:8px 0 30px 34px}
+.gl{position:absolute;left:0;right:0;top:var(--y);border-top:1px dotted var(--grid)}
+.yt{position:absolute;right:100%;top:var(--y);transform:translateY(-50%);margin-right:12px;font-size:11.5px;color:var(--dim)}
+.xts{position:absolute;left:0;right:0;top:100%;height:0}
+.xt{position:absolute;left:var(--x);top:9px;transform:translateX(-50%);font-size:11.5px;color:var(--dim);white-space:nowrap}
+.sc.log .xts.lin,.sc.lin .xts.lg,.sc.log .pf.lin,.sc.lin .pf.lg{display:none}
+.pf{position:absolute;inset:0;width:100%;height:100%;overflow:visible;display:none}
+.sc.pareto.log .pf.lg,.sc.pareto.lin .pf.lin{display:block}
+.pf polyline{fill:none;stroke:var(--accent);stroke-width:1.5;stroke-dasharray:2 5;stroke-linecap:round;vector-effect:non-scaling-stroke}
+.ld{position:absolute;left:var(--xg);right:0;top:var(--y);border-top:1px solid color-mix(in srgb,var(--c) 30%,transparent)}
+.pt{position:absolute;left:var(--xg);top:var(--y);width:11px;height:11px;margin:-5.5px 0 0 -5.5px;border-radius:50%;
+  background:var(--c);box-shadow:0 0 0 2.5px var(--bg);z-index:2}
+.sc.lin .pt,.sc.lin .ld{left:var(--xl)}
+.sc-names{position:relative;margin:8px 0 30px}
+.sc-names svg{position:absolute;left:0;top:0;width:100%;height:100%;overflow:visible}
+.sc-names line{stroke-opacity:.45;stroke-width:1;vector-effect:non-scaling-stroke}
+.sn{position:absolute;left:26px;top:var(--ly);transform:translateY(-50%);white-space:nowrap;font-size:13px;font-weight:500;color:var(--c)}
+.sn i{display:none}
+.sc-x{grid-column:2;text-align:center;color:var(--mute);font-size:12.5px;padding:4px 220px 0 34px}
+
+/* 岗位 */
+.rgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:30px 40px}
+.rc h3{font-size:14px;margin-bottom:12px}
+.rc h3 a::after{content:"";display:inline-block;width:6px;height:6px;margin:0 0 2px 8px;border:solid var(--mute);border-width:1.5px 1.5px 0 0;transform:rotate(45deg)}
+.rc .bars.h .tk{padding-right:40px}
+
+/* 谎报 */
+.lies{display:flex;flex-direction:column}
+.lr{display:grid;grid-template-columns:200px 34px minmax(0,1fr);align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--line)}
+.lr .nm{margin:0 0 0 19px;text-align:left;font-size:13.5px}
+.ln{font-size:16px;font-weight:600}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{padding:3px 9px;border-radius:3px;font-size:12.5px;background:color-mix(in srgb,var(--c) 16%,transparent);
+  box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--c) 40%,transparent)}
+.mk{white-space:normal;overflow-wrap:anywhere}
+.chip{max-width:100%;line-height:1.5;border-left:2px solid var(--accent)}
+.chip:has([data-role="QC"]){border-left-color:#22C3D6}
+.chip:has([data-role="SORT"]){border-left-color:#A57CFF}
+.chip:has([data-role="FIND"]){border-left-color:#34A853}
+
+/* 每题 */
+.tgrid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:26px 30px}
+.tb h3{font-size:14px;margin-bottom:10px}
+.tr{display:grid;grid-template-columns:12px minmax(0,1fr) 38px;align-items:center;gap:10px;height:26px}
+.ti{color:var(--dim);font-size:12px}
+.tt{position:relative;height:12px;background:var(--track);border-radius:2px}
+.tf{position:absolute;left:0;top:0;bottom:0;width:var(--w);background:var(--c);border-radius:2px}
+.tv{text-align:right;font-size:12.5px;font-weight:500}
+.zr{position:absolute;left:6px;top:50%;transform:translateY(-50%);font-size:11px;line-height:1;color:var(--mute);white-space:nowrap}
+.ch{display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:6px 22px;margin-bottom:18px}
+.card .ch h2{margin-bottom:0}
+.ch .un{color:var(--dim);font-size:13px}
+.tabs.sv{gap:4px 18px}
+
+@media (max-width:1100px){
+  .tgrid{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .card:not(.big){border-right:0;border-bottom:1px solid var(--line)}
+  .vbars{padding-left:4px}
+  .vn{height:182px}
+  .vn span{width:auto;white-space:nowrap;right:auto;left:50%;top:8px;writing-mode:vertical-rl;transform-origin:50% 50%;transform:translateX(-50%) rotate(180deg);font-size:12px;line-height:1.2}
+  .bars{flex-direction:column;gap:4px;padding-top:0}
+  .b{display:grid;padding-left:19px;grid-template-columns:216px minmax(0,1fr);align-items:center;column-gap:10px}
+  .nm{order:-1;margin:0;text-align:left;font-size:12.5px}
+  .tk{height:15px;display:block;padding-right:54px;border:0}
+  .fl{width:var(--w);height:100%;border-radius:0 2px 2px 0}
+  .sg{top:0;bottom:0;right:auto;height:auto;width:var(--w)}
+  .v{left:100%;bottom:auto;top:50%;transform:translateY(-50%);margin:0 0 0 7px}
+}
+@media (max-width:900px){
+  .wrap{grid-template-columns:minmax(0,1fr)}
+  .side{order:-1;border-left:0;border-bottom:1px solid var(--line)}
+  .side-toggle{display:flex;align-items:center;width:100%;padding:12px 16px;font-size:14px}
+  .side-in{display:none;position:static;padding:0 16px 14px}
+  .side.open .side-in{display:block}
+  .sh h2{display:none}
+  .sh{justify-content:flex-end;margin:0}
+  .side ul{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));column-gap:24px}
+  .top{padding:0 16px}
+  main{padding:0 16px 48px}
+  .hero{margin:0 -16px}
+  .card{padding:24px 16px}
+}
+@media (max-width:720px){
+  .top{gap:14px}
+  .top nav{gap:14px;padding-left:14px}
+  .top nav a{font-size:13px}
+  .card{border-right:0;border-bottom:1px solid var(--line)}
+  .vbars{--h:240px;gap:0 4px;padding-left:14px}
+  .vf{width:100%;border-radius:2px 2px 0 0}
+  .vv{writing-mode:vertical-rl;transform:translate(-50%,-50%) rotate(180deg);font-size:11px}
+  .vb .lo{width:16px;height:16px;background-size:11px;border-radius:4px;margin-top:8px}
+  .vn{height:170px}
+  .vn span{font-size:11px}
+  .card:last-child{border-bottom:0}
+  .b,.bars.h .b{grid-template-columns:178px minmax(0,1fr)}
+  .nm,.bars.h .nm{font-size:12px}
+  .tk,.bars.h .tk{padding-right:48px}
+  .sc-body{grid-template-columns:minmax(0,1fr);height:auto}
+  .plot{height:300px;margin:8px 4px 30px 30px}
+  .ld,.sc-names svg{display:none}
+  .sc-names{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px 14px;margin:14px 0 0}
+  .sn{position:static;transform:none;display:flex;align-items:center;gap:7px;font-size:12.5px;white-space:normal}
+  .sn i{display:block;width:8px;height:8px;border-radius:50%;background:var(--c)}
+  .sc{grid-template-columns:minmax(0,1fr)}
+  .sc-y{writing-mode:horizontal-tb;text-align:left;padding:0 0 4px}
+  .sc-x{grid-row:auto;grid-column:1;padding:0 0 0 30px}
+  .sc-names{grid-row:auto}
+  .rgrid,.tgrid{grid-template-columns:minmax(0,1fr)}
+  .side ul{grid-template-columns:minmax(0,1fr)}
+  .lr{grid-template-columns:26px minmax(0,1fr);gap:6px 10px}
+  .lr .nm{grid-column:1/-1}
+  .ctl{gap:16px}
+}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+/* 累计访客（SPEC 11.29） */
+.vc{padding:20px 28px 28px;border-top:1px solid var(--line);font-size:12px;color:var(--dim)}
+.vc b{margin-left:8px;font-weight:500;color:var(--mute)}
+@media (max-width:900px){.vc{padding:18px 16px 24px}}
+/* 第一次进站的提示（SPEC 11.28） */
+#first{width:min(420px,calc(100vw - 32px));max-height:calc(100dvh - 32px);padding:0;border:1px solid var(--grid);border-radius:8px;background:#151311;color:var(--fg)}
+#first[open]{display:flex;flex-direction:column}
+#first::backdrop{background:#000c}
+#first h2{flex:none;padding:24px 24px 12px;font-size:18px}
+#first .fb{min-height:0;overflow-y:auto;padding:0 24px;overscroll-behavior:contain}
+#first p{margin:0 0 12px;font-size:14px;line-height:1.75;color:#D6D0CA}
+#first .lead{margin-bottom:14px;font-size:16px;line-height:1.6;color:var(--fg)}
+#first p b{margin-right:.6em;font-weight:600;color:var(--fg)}
+#first .foot{margin:16px 0 0;font-size:12px;line-height:1.6;color:var(--mute)}
+#first form{flex:none;display:flex;justify-content:flex-end;padding:20px 24px}
+@media (max-width:720px){#first h2{padding:20px 18px 10px}#first .fb{padding:0 18px}#first form{padding:18px}#first form button{width:100%}}
+#first button{padding:9px 22px;border-radius:5px;background:var(--accent);color:#000;font-size:14px;font-weight:500}
+</style>
+<style id="hide"></style>
+<style>
+/* 模型详情页：在 template.html 的样式之上加的 */
+.dp{max-width:1280px;margin:0 auto;padding:0 28px 80px}
+.dh{display:flex;flex-wrap:wrap;align-items:center;gap:16px;padding:42px 0 30px}
+.dh .sv{margin-left:auto}
+.kcs>.pane.on{display:contents}
+.dh .lo{width:46px;height:46px;border-radius:12px;background-size:28px}
+.dh h1{margin:0;font-size:44px;line-height:1.08;font-weight:600;letter-spacing:-.028em}
+
+/* 指标卡 */
+.kcs{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}
+.kc{display:flex;flex-direction:column;padding:16px 18px 20px;border-radius:12px;background:#0D0C0B;box-shadow:inset 0 0 0 1px var(--line)}
+.kh{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.kh h2{padding:5px 12px;border-radius:999px;background:#1B1917;font-size:13.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rk{display:inline-flex;align-items:center;justify-content:flex-end;gap:3px;color:var(--mute);font-size:13px;white-space:nowrap}
+.hs{flex:none;width:10px;height:10px;fill:none;stroke:var(--dim);stroke-width:1.2}
+.mini{display:flex;align-items:flex-end;gap:3px;height:92px;margin:26px 0 22px;border-bottom:1px solid var(--grid)}
+.mini i{flex:1;height:var(--w);min-height:2px;background:#2B2826;border-radius:2px 2px 0 0}
+.mini i.me{background:var(--c)}
+.kb{margin-top:auto}
+.sub{display:flex;flex-wrap:wrap;gap:2px 14px;min-height:19px;margin-bottom:6px;font-size:12.5px;color:var(--mute)}
+.sub b{margin-left:5px;font-weight:500;color:var(--fg)}
+.big{font-size:46px;line-height:1;font-weight:600;letter-spacing:-.03em;color:var(--c)}
+
+/* 评价 + 规格 */
+.db{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:64px;margin-top:40px}
+.rs{padding:28px 0 32px;border-top:1px solid var(--line)}
+.rs-one_line{border-top:0;padding-top:4px}
+.rs>h2{margin-bottom:14px;font-size:13px;font-weight:500;color:var(--mute);letter-spacing:.04em}
+.rs p{margin:0;max-width:44em;font-size:15.5px;line-height:1.9;color:#D9D3CD}
+.rs p.one{font-size:20px;line-height:1.75;color:var(--fg)}
+.rrs{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0 40px}
+.rr{padding:20px 0 24px;border-top:1px solid var(--line)}
+.rr:nth-child(-n+2){border-top:0;padding-top:2px}
+.rr h3{font-size:16px;color:var(--c)}
+.rr p{margin-top:10px;font-size:14.5px;line-height:1.85}
+
+.rd{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:24px 40px}
+.rd h3{margin-bottom:10px;font-size:14px}
+.rd ul{list-style:none;margin:0;padding:0}
+.rd li{position:relative;padding:9px 0 9px 18px;border-top:1px solid var(--line);font-size:14.5px;line-height:1.7;color:#D9D3CD}
+.rd li::before{content:"";position:absolute;left:0;top:18px;width:8px;height:2px;background:var(--c)}
+.rd .avoid li::before{background:var(--dim)}
+
+.spec{position:sticky;top:82px;align-self:start}
+.spec h2{padding-bottom:14px;font-size:17px;border-bottom:1px solid var(--line)}
+.spec dl{margin:0}
+.sr{display:flex;align-items:center;justify-content:space-between;gap:16px;min-height:48px;padding:10px 0;border-bottom:1px solid var(--line)}
+.sr dt{flex:none;color:var(--mute);font-size:13.5px}
+.sr dd{display:flex;align-items:center;justify-content:flex-end;gap:7px;margin:0;min-width:0;text-align:right;
+  font-size:13.5px;font-weight:500;overflow-wrap:anywhere}
+.ic{width:18px;height:18px;fill:none;stroke:var(--dim);stroke-width:1.3;stroke-linejoin:round;stroke-linecap:round}
+.ic.on{stroke:var(--fg)}
+.sw{width:28px;height:16px}
+.sw rect{fill:#1B1917;stroke:#3A3633;stroke-width:1.5}
+.sw circle{fill:var(--dim)}
+.sw.on rect{fill:var(--c);stroke:var(--c)}
+.sw.on circle{fill:#000}
+
+/* 下面的数据 */
+.ds{margin-top:52px;padding-top:30px;border-top:1px solid var(--line)}
+.ds>h2{margin-bottom:22px;font-size:17px;letter-spacing:-.01em}
+.mrs{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0 56px}
+.mr{display:grid;grid-template-columns:96px minmax(0,1fr) 46px 52px;align-items:center;gap:12px;height:34px}
+.mr .ml{font-size:13.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mr .tv{font-size:13px}
+.dl2{display:flex;flex-wrap:wrap;align-items:center;gap:14px 20px}
+.dl2>h2{margin:0}
+.dl2 .ln{font-size:28px;line-height:1;font-weight:600;color:var(--c)}
+
+@media (max-width:1100px){
+  .kcs{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .db{grid-template-columns:minmax(0,1fr);gap:8px}
+  .spec{position:static;order:-1;margin-bottom:24px}
+  .rrs,.mrs{grid-template-columns:minmax(0,1fr)}
+  .rr:nth-child(2){border-top:1px solid var(--line);padding-top:20px}
+}
+@media (max-width:720px){
+  .dp{padding:0 16px 56px}
+  .dh{gap:12px;padding:26px 0 22px}
+  .dh .lo{width:36px;height:36px;border-radius:9px;background-size:22px}
+  .dh h1{font-size:30px}
+  .rs p.one{font-size:17.5px}
+  .rs p,.rr p,.rd li{font-size:15px}
+  .rd{grid-template-columns:minmax(0,1fr)}
+  .mr{grid-template-columns:94px minmax(0,1fr) 40px 52px;gap:10px}
+  .mr .ml{font-size:13px}
+}
+@media (max-width:560px){
+  .kcs{grid-template-columns:minmax(0,1fr);gap:10px}
+  .kc{display:grid;grid-template-columns:minmax(0,1fr) 124px;grid-template-areas:"h h" "b m";gap:14px 16px;padding:14px 16px 16px}
+  .kh{grid-area:h}
+  .mini{grid-area:m;align-self:end;height:52px;margin:0}
+  .kb{grid-area:b}
+  .big{font-size:36px}
+  .dp .tgrid{grid-template-columns:repeat(2,minmax(0,1fr));gap:22px 18px}
+  .dp .tr{gap:7px;grid-template-columns:9px minmax(0,1fr) 34px}
+  .dp .tv{font-size:12px}
+}
+
+.ds-speed .mrs{grid-template-columns:minmax(0,1fr);max-width:780px}
+.ds-speed .mr{grid-template-columns:190px minmax(0,1fr) 60px 52px}
+@media(max-width:600px){.ds-speed .mr{grid-template-columns:146px minmax(0,1fr) 43px 40px;gap:7px}.ds-speed .mr .ml{font-size:11px}}
+
+.dp .tr{height:auto;min-height:48px;grid-template-columns:minmax(0,1fr) 38px;row-gap:4px;padding:5px 0}
+.dp .tr .ti{grid-column:1/-1;color:var(--mute);font-size:11px;line-height:1.4}
+
+.lo[data-v="google"]{display:block;background-image:url(data:image/svg+xml;base64,PHN2ZyB2aWV3Qm94PSIwIDAgMjQgMjQiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHBhdGggZD0iTTIwLjYxNiAxMC44MzVhMTQuMTQ3IDE0LjE0NyAwIDAxLTQuNDUtMy4wMDEgMTQuMTExIDE0LjExMSAwIDAxLTMuNjc4LTYuNDUyLjUwMy41MDMgMCAwMC0uOTc1IDAgMTQuMTM0IDE0LjEzNCAwIDAxLTMuNjc5IDYuNDUyIDE0LjE1NSAxNC4xNTUgMCAwMS00LjQ1IDMuMDAxYy0uNjUuMjgtMS4zMTguNTA1LTIuMDAyLjY3OGEuNTAyLjUwMiAwIDAwMCAuOTc1Yy42ODQuMTcyIDEuMzUuMzk3IDIuMDAyLjY3N2ExNC4xNDcgMTQuMTQ3IDAgMDE0LjQ1IDMuMDAxIDE0LjExMiAxNC4xMTIgMCAwMTMuNjc5IDYuNDUzLjUwMi41MDIgMCAwMC45NzUgMGMuMTcyLS42ODUuMzk3LTEuMzUxLjY3Ny0yLjAwM2ExNC4xNDUgMTQuMTQ1IDAgMDEzLjAwMS00LjQ1IDE0LjExMyAxNC4xMTMgMCAwMTYuNDUzLTMuNjc4LjUwMy41MDMgMCAwMDAtLjk3NSAxMy4yNDUgMTMuMjQ1IDAgMDEtMi4wMDMtLjY3OHoiIGZpbGw9IiMzMTg2RkYiPjwvcGF0aD48cGF0aCBkPSJNMjAuNjE2IDEwLjgzNWExNC4xNDcgMTQuMTQ3IDAgMDEtNC40NS0zLjAwMSAxNC4xMTEgMTQuMTExIDAgMDEtMy42NzgtNi40NTIuNTAzLjUwMyAwIDAwLS45NzUgMCAxNC4xMzQgMTQuMTM0IDAgMDEtMy42NzkgNi40NTIgMTQuMTU1IDE0LjE1NSAwIDAxLTQuNDUgMy4wMDFjLS42NS4yOC0xLjMxOC41MDUtMi4wMDIuNjc4YS41MDIuNTAyIDAgMDAwIC45NzVjLjY4NC4xNzIgMS4zNS4zOTcgMi4wMDIuNjc3YTE0LjE0NyAxNC4xNDcgMCAwMTQuNDUgMy4wMDEgMTQuMTEyIDE0LjExMiAwIDAxMy42NzkgNi40NTMuNTAyLjUwMiAwIDAwLjk3NSAwYy4xNzItLjY4NS4zOTctMS4zNTEuNjc3LTIuMDAzYTE0LjE0NSAxNC4xNDUgMCAwMTMuMDAxLTQuNDUgMTQuMTEzIDE0LjExMyAwIDAxNi40NTMtMy42NzguNTAzLjUwMyAwIDAwMC0uOTc1IDEzLjI0NSAxMy4yNDUgMCAwMS0yLjAwMy0uNjc4eiIgZmlsbD0idXJsKCNsb2JlLWljb25zLWdlbWluaS0wLV9SXzBfKSI+PC9wYXRoPjxwYXRoIGQ9Ik0yMC42MTYgMTAuODM1YTE0LjE0NyAxNC4xNDcgMCAwMS00LjQ1LTMuMDAxIDE0LjExMSAxNC4xMTEgMCAwMS0zLjY3OC02LjQ1Mi41MDMuNTAzIDAgMDAtLjk3NSAwIDE0LjEzNCAxNC4xMzQgMCAwMS0zLjY3OSA2LjQ1MiAxNC4xNTUgMTQuMTU1IDAgMDEtNC40NSAzLjAwMWMtLjY1LjI4LTEuMzE4LjUwNS0yLjAwMi42NzhhLjUwMi41MDIgMCAwMDAgLjk3NWMuNjg0LjE3MiAxLjM1LjM5NyAyLjAwMi42NzdhMTQuMTQ3IDE0LjE0NyAwIDAxNC40NSAzLjAwMSAxNC4xMTIgMTQuMTEyIDAgMDEzLjY3OSA2LjQ1My41MDIuNTAyIDAgMDAuOTc1IDBjLjE3Mi0uNjg1LjM5Ny0xLjM1MS42NzctMi4wMDNhMTQuMTQ1IDE0LjE0NSAwIDAxMy4wMDEtNC40NSAxNC4xMTMgMTQuMTEzIDAgMDE2LjQ1My0zLjY3OC41MDMuNTAzIDAgMDAwLS45NzUgMTMuMjQ1IDEzLjI0NSAwIDAxLTIuMDAzLS42Nzh6IiBmaWxsPSJ1cmwoI2xvYmUtaWNvbnMtZ2VtaW5pLTEtX1JfMF8pIj48L3BhdGg+PHBhdGggZD0iTTIwLjYxNiAxMC44MzVhMTQuMTQ3IDE0LjE0NyAwIDAxLTQuNDUtMy4wMDEgMTQuMTExIDE0LjExMSAwIDAxLTMuNjc4LTYuNDUyLjUwMy41MDMgMCAwMC0uOTc1IDAgMTQuMTM0IDE0LjEzNCAwIDAxLTMuNjc5IDYuNDUyIDE0LjE1NSAxNC4xNTUgMCAwMS00LjQ1IDMuMDAxYy0uNjUuMjgtMS4zMTguNTA1LTIuMDAyLjY3OGEuNTAyLjUwMiAwIDAwMCAuOTc1Yy42ODQuMTcyIDEuMzUuMzk3IDIuMDAyLjY3N2ExNC4xNDcgMTQuMTQ3IDAgMDE0LjQ1IDMuMDAxIDE0LjExMiAxNC4xMTIgMCAwMTMuNjc5IDYuNDUzLjUwMi41MDIgMCAwMC45NzUgMGMuMTcyLS42ODUuMzk3LTEuMzUxLjY3Ny0yLjAwM2ExNC4xNDUgMTQuMTQ1IDAgMDEzLjAwMS00LjQ1IDE0LjExMyAxNC4xMTMgMCAwMTYuNDUzLTMuNjc4LjUwMy41MDMgMCAwMDAtLjk3NSAxMy4yNDUgMTMuMjQ1IDAgMDEtMi4wMDMtLjY3OHoiIGZpbGw9InVybCgjbG9iZS1pY29ucy1nZW1pbmktMi1fUl8wXykiPjwvcGF0aD48ZGVmcz48bGluZWFyR3JhZGllbnQgZ3JhZGllbnRVbml0cz0idXNlclNwYWNlT25Vc2UiIGlkPSJsb2JlLWljb25zLWdlbWluaS0wLV9SXzBfIiB4MT0iNyIgeDI9IjExIiB5MT0iMTUuNSIgeTI9IjEyIj48c3RvcCBzdG9wLWNvbG9yPSIjMDhCOTYyIj48L3N0b3A+PHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjMDhCOTYyIiBzdG9wLW9wYWNpdHk9IjAiPjwvc3RvcD48L2xpbmVhckdyYWRpZW50PjxsaW5lYXJHcmFkaWVudCBncmFkaWVudFVuaXRzPSJ1c2VyU3BhY2VPblVzZSIgaWQ9ImxvYmUtaWNvbnMtZ2VtaW5pLTEtX1JfMF8iIHgxPSI4IiB4Mj0iMTEuNSIgeTE9IjUuNSIgeTI9IjExIj48c3RvcCBzdG9wLWNvbG9yPSIjRjk0NTQzIj48L3N0b3A+PHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjRjk0NTQzIiBzdG9wLW9wYWNpdHk9IjAiPjwvc3RvcD48L2xpbmVhckdyYWRpZW50PjxsaW5lYXJHcmFkaWVudCBncmFkaWVudFVuaXRzPSJ1c2VyU3BhY2VPblVzZSIgaWQ9ImxvYmUtaWNvbnMtZ2VtaW5pLTItX1JfMF8iIHgxPSIzLjUiIHgyPSIxNy41IiB5MT0iMTMuNSIgeTI9IjEyIj48c3RvcCBzdG9wLWNvbG9yPSIjRkFCQzEyIj48L3N0b3A+PHN0b3Agb2Zmc2V0PSIuNDYiIHN0b3AtY29sb3I9IiNGQUJDMTIiIHN0b3Atb3BhY2l0eT0iMCI+PC9zdG9wPjwvbGluZWFyR3JhZGllbnQ+PC9kZWZzPjwvc3ZnPg==)}</style>
+</head>
+<body>
+<header class="top"><a class="mark" href="../index.html" data-home>VideoBench</a><nav><a href="../more.html#scatter"><span class="lb">Metric comparison</span></a><a href="../more.html#more"><span class="lb">More metrics</span></a><a href="../more.html#speed"><span class="lb">Speed tests</span></a></nav><a class="lang" href="../../m/hydrogen.html" data-lang><span class="lb">ZH</span></a></header><main class="dp" style="--c:#34A853"><header class="dh"><i class="lo" aria-hidden="true" data-v="google"></i><h1>Gemini 4 Hydrogen <b class="audit-tail">(xhigh)<sup class="audit-mark" data-audit tabindex="0" role="button" aria-describedby="audit-tip">†</sup></b></h1><div class="tabs sv" role="tablist"><button type="button" class="tab on" data-group="sv" data-tab="s"><span class="lb">With speed</span></button><button type="button" class="tab" data-group="sv" data-tab="n"><span class="lb">Without speed</span></button></div></header><div class="kcs"><div class="pane kp on" data-pane-group="sv" data-pane="s"><div class="kc"><div class="kh"><h2><span class="lb">Overall score</span></h2><span class="rk"><svg class="hs" viewBox="0 0 10 10" aria-hidden="true"><path d="M3.9 1 2.9 9M7.1 1 6.1 9M1.3 3.7h7.6M.9 6.3h7.6"/></svg><span data-k="rk|q|hydrogen">2/20</span></span></div><div class="mini"><i style="--w:89.2%"></i><i class="me" data-bar="q|hydrogen" style="--w:85.3%"></i><i style="--w:84.8%"></i><i style="--w:82.4%"></i><i style="--w:81.5%"></i><i style="--w:81.4%"></i><i style="--w:81.4%"></i><i style="--w:80.4%"></i><i style="--w:77.5%"></i><i style="--w:76.2%"></i><i style="--w:75.1%"></i><i style="--w:73.6%"></i><i style="--w:64.3%"></i><i style="--w:61.8%"></i><i style="--w:61.6%"></i><i style="--w:59.8%"></i><i style="--w:57.6%"></i><i style="--w:45.5%"></i><i style="--w:44.2%"></i><i style="--w:39.3%"></i></div><div class="kb"><div class="sub"></div><div class="big" data-k="q|hydrogen">85.3</div></div></div></div><div class="pane kp" data-pane-group="sv" data-pane="n"><div class="kc"><div class="kh"><h2><span class="lb">Overall score</span></h2><span class="rk"><svg class="hs" viewBox="0 0 10 10" aria-hidden="true"><path d="M3.9 1 2.9 9M7.1 1 6.1 9M1.3 3.7h7.6M.9 6.3h7.6"/></svg><span data-k="rk|q0|hydrogen">3/20</span></span></div><div class="mini"><i style="--w:89.8%"></i><i style="--w:85.7%"></i><i class="me" data-bar="q0|hydrogen" style="--w:85.5%"></i><i style="--w:84.8%"></i><i style="--w:81.5%"></i><i style="--w:81.5%"></i><i style="--w:81.5%"></i><i style="--w:80.8%"></i><i style="--w:78.2%"></i><i style="--w:77.6%"></i><i style="--w:76.2%"></i><i style="--w:74.0%"></i><i style="--w:69.6%"></i><i style="--w:65.4%"></i><i style="--w:62.2%"></i><i style="--w:62.1%"></i><i style="--w:61.8%"></i><i style="--w:57.6%"></i><i style="--w:53.6%"></i><i style="--w:45.5%"></i></div><div class="kb"><div class="sub"></div><div class="big" data-k="q0|hydrogen">85.5</div></div></div></div><div class="kc"><div class="kh"><h2><span class="lb">Total time</span><sup class="st">*</sup></h2><span class="rk"><svg class="hs" viewBox="0 0 10 10" aria-hidden="true"><path d="M3.9 1 2.9 9M7.1 1 6.1 9M1.3 3.7h7.6M.9 6.3h7.6"/></svg><span data-k="rk|tot|hydrogen">9/20</span></span></div><div class="mini"><i style="--w:2.4%"></i><i style="--w:5.1%"></i><i style="--w:5.2%"></i><i style="--w:5.9%"></i><i style="--w:6.1%"></i><i style="--w:6.4%"></i><i style="--w:7.9%"></i><i style="--w:8.4%"></i><i class="me" data-bar="tot|hydrogen" style="--w:11.2%"></i><i style="--w:13.1%"></i><i style="--w:16.6%"></i><i style="--w:19.7%"></i><i style="--w:20.6%"></i><i style="--w:29.1%"></i><i style="--w:35.2%"></i><i style="--w:35.4%"></i><i style="--w:35.8%"></i><i style="--w:65.4%"></i><i style="--w:81.8%"></i><i style="--w:100.0%"></i></div><div class="kb"><div class="sub"></div><div class="big" data-k="tot|hydrogen">1.4h</div></div></div><div class="kc"><div class="kh"><h2><span class="lb">Tasks passed</span></h2><span class="rk"><svg class="hs" viewBox="0 0 10 10" aria-hidden="true"><path d="M3.9 1 2.9 9M7.1 1 6.1 9M1.3 3.7h7.6M.9 6.3h7.6"/></svg><span data-k="rk|pass|hydrogen">4/20</span></span></div><div class="mini"><i style="--w:81.8%"></i><i style="--w:77.3%"></i><i style="--w:72.7%"></i><i class="me" data-bar="pass|hydrogen" style="--w:68.2%"></i><i style="--w:68.2%"></i><i style="--w:68.2%"></i><i style="--w:68.2%"></i><i style="--w:68.2%"></i><i style="--w:59.1%"></i><i style="--w:59.1%"></i><i style="--w:54.5%"></i><i style="--w:50.0%"></i><i style="--w:50.0%"></i><i style="--w:50.0%"></i><i style="--w:50.0%"></i><i style="--w:45.5%"></i><i style="--w:40.9%"></i><i style="--w:36.4%"></i><i style="--w:31.8%"></i><i style="--w:18.2%"></i></div><div class="kb"><div class="sub"></div><div class="big" data-k="pass|hydrogen">15/22</div></div></div></div><div class="db"><div class="rvw"><section class="rs rs-one_line"><h2><span class="lb">One-line review</span></h2><p class="one" data-k="t|hydrogen|one_line">The overall score was 85.49 without speed and 85.34 with speed. The model passed 15 of 22 scored tasks. It earned full marks for content on all three tasks in each of Shot Finding and Review, and made revisions quickly when the feedback was clear. It submitted no subtitles for the hard original audio task. Incomplete channel logs limit direct comparisons of pass counts and honesty with other models.</p></section><section class="rs rs-working_style"><h2><span class="lb">Work habits</span></h2><p data-k="t|hydrogen|working_style">No scored tasks ended in a timeout or error. The median time from assignment to submission was 195.4 seconds. The longest footage logging task took 645.3 seconds. Speed penalties were small overall. After the last change to a deliverable, the model spent a median of 18.4 seconds checking its work. Timing includes the extra step of sending itself images as attachments. Tool call counts are unavailable. The new evidence package records 386,803 output tokens across the scored tasks. Token usage is excluded from scoring. Role scores alone tell you little about response times for short answers or image tasks. Factor in the channel overhead before assigning small jobs.</p></section><section class="rs rs-honesty"><h2><span class="lb">Honesty and access scope</span></h2><p data-k="t|hydrogen|honesty">The check recorded 0 false claims. Evidence supported 86 claims, contradicted 0, and left 56 unverified, mostly about which commands ran. The sources of all 74 verifiable images checked out. The channel omits some tool calls, so the logs cannot establish out-of-directory access or whether the model listed images it never opened. That limits direct comparisons of pass counts and honesty with other models. The grader flagged out-of-directory access on three tasks. A manual check of the commands confirmed false positives, and the flags were removed. The model reported where it got stuck. It marked the original audio subtitle task as blocked and the task with two spoken recordings as partially complete.</p></section><section class="rs rs-dispatch"><h2><span class="lb">Task recommendations</span></h2><div class="rd"><div class="give"><h3><span class="lb">Good fit</span></h3><ul><li data-k="t|hydrogen|give|0">Assign Review tasks that involve finding picture and audio issues when the schedule allows. It got the content right on all three.</li><li data-k="t|hydrogen|give|1">Assign revisions when the feedback is clear. It worked quickly and made no unrelated changes.</li><li data-k="t|hydrogen|give|2">Assign routine Voiceover Editing and spot-check the harder parts after delivery.</li><li data-k="t|hydrogen|give|3">Have it check proper names in subtitles against the script.</li><li data-k="t|hydrogen|give|4">Have it find shots and check whether the target shots exist in the source footage.</li></ul></div><div class="avoid"><h3><span class="lb">Poor fit</span></h3><ul><li data-k="t|hydrogen|avoid|0">Check film titles and whether clips contain dialogue after it submits film clip logs.</li><li data-k="t|hydrogen|avoid|1">Avoid subtitle tasks that require hearing the original speech clearly or identifying the language.</li><li data-k="t|hydrogen|avoid|2">Avoid editing choices that rely entirely on taste, with no rules to consult.</li><li data-k="t|hydrogen|avoid|3">When revision feedback is ambiguous, have someone check the full list of options it proposes.</li><li data-k="t|hydrogen|avoid|4">Avoid small tasks that need an immediate reply. Starting a task and sending images both add overhead.</li></ul></div></div></section><section class="rs rs-confidence"><h2><span class="lb">Confidence</span></h2><p data-k="t|hydrogen|confidence">Most roles had only three tasks, with one scored attempt per task. Content was consistent on this set of Shot Finding and Review tasks. Film clip logging was still slightly below the pass threshold. Image tasks include an attachment step, and incomplete tool logs limit checks for out-of-directory access and false claims. The model profile lists audio support, but the model said it could not listen to the recording. The reason is unclear. The subtitle task scored zero based on what it submitted. The run leaves audio support on other channels unresolved.</p></section><section class="rs rs-roles"><h2><span class="lb">Role performance</span></h2><div class="rrs"><div class="rr"><h3><a class="rl" href="../r/SORT.html">Footage Logging</a></h3><p data-k="t|hydrogen|role|SORT">The role score was 96.44 without speed and 96.41 with speed. It passed two of three tasks. It earned full marks for grouping recordings and reported that the check script failed to run. It got all 84 items right on the inventory task (SORT2). On the film clip task (SORT3), it got 56 of 60 right and scored 89.33 without speed, below the pass threshold. Most mistakes involved film titles or whether a clip contained dialogue.</p></div><div class="rr"><h3><a class="rl" href="../r/FIND.html">Shot Finding</a></h3><p data-k="t|hydrogen|role|FIND">It passed all three tasks. The role score was 100 without speed and 99.89 with speed. It got both shot location tasks right and correctly reported that one target shot was absent from the source footage on the hard task. It got all 24 items right on the film and character identification task (FIND2).</p></div><div class="rr"><h3><a class="rl" href="../r/VO.html">Voiceover Editing</a></h3><p data-k="t|hydrogen|role|VO">The role score was 96.15 with speed. It passed two of three tasks and earned full marks for content on the first two tasks on editing recordings. On the hard task with two recordings, its content quality score was 0.899, just below the pass threshold. It compared the audio spectra and found that the apparent repetition in the supplied transcript was spurious. It left the edit decision for manual confirmation and scored 0.333 on that item. It failed 3 mandatory checks overall.</p></div><div class="rr"><h3><a class="rl" href="../r/CUT.html">B-roll Editing</a></h3><p data-k="t|hydrogen|role|CUT">On the two text-based B-roll Editing tasks, 3 of 5 choices matched the usable final cut on the easier task, and 3 of 7 matched on the harder task. It followed the mandatory editing requirements on both. The scores without speed were 52.00 and 42.86, both below the pass threshold. An editor still needs to review the final choices.</p></div><div class="rr"><h3><a class="rl" href="../r/TASTE.html">Taste</a></h3><p data-k="t|hydrogen|role|TASTE">The role score was 66.67 without speed and includes only the first two tasks. With the editing rules available, it followed them and got all 20 choices right. Without a rule file to consult, it got 10 of 15 choices right. Its content quality score was 0.333, below the pass threshold. The benchmark included only one task without a rule file, so there is little evidence of how well it makes editing decisions by intuition.</p></div><div class="rr"><h3><a class="rl" href="../r/QC.html">Review</a></h3><p data-k="t|hydrogen|role|QC">The role score was 99.61 with speed, among the highest in this role. It passed all three tasks, each with a content quality score of 1.000. On the easy task, it found the black frames, white flashes, and corner watermark. On the hard task, it found the stray frames, repeated footage, and subtitle typos, with no false positives. The easy, medium, and hard tasks took 239.3, 185.7, and 551.5 seconds, respectively.</p></div><div class="rr"><h3><a class="rl" href="../r/FIX.html">Revisions</a></h3><p data-k="t|hydrogen|role|FIX">The role score was 91.67 without speed. It passed two of three tasks. It earned full marks on both tasks with clear feedback, taking just 65.7 and 53.5 seconds and making no unrelated changes. On the hard task, it spotted that the feedback had two possible readings, left the configuration as it was, and asked for confirmation. Its proposed clips covered only one reading. It scored 0.750 for content quality and failed a mandatory check.</p></div><div class="rr"><h3><a class="rl" href="../r/SUB.html">Subtitles</a></h3><p data-k="t|hydrogen|role|SUB">The role score was 66.14 without speed and 66.08 with speed. It passed two of three tasks. It scored 98.43 and 100 on the first two, using the script to correct proper names and leaving cut-off text incomplete. The hard task called for subtitles from the original audio, but the reference transcript did not match the recording. The model said it could not listen to the recording, submitted no subtitle file, and marked the task as blocked. It scored 0. The grading found that it should still have attempted the task.</p></div></div></section></div><aside class="spec"><h2><span class="lb">Test setup</span></h2><dl><div class="sr"><dt><span class="lb">Tool</span></dt><dd>Antigravity</dd></div><div class="sr"><dt><span class="lb">Access route</span></dt><dd>Antigravity</dd></div><div class="sr"><dt><span class="lb">Model</span></dt><dd>gemini-4-hydrogen-xhigh</dd></div><div class="sr"><dt><span class="lb">Reasoning effort</span></dt><dd>xhigh</dd></div><div class="sr"><dt><span class="lb">Fast mode</span></dt><dd><svg class="sw" viewBox="0 0 28 16" aria-hidden="true"><rect x=".75" y=".75" width="26.5" height="14.5" rx="7.25"/><circle cx="8" cy="8" r="4.2"/></svg></dd></div><div class="sr"><dt><span class="lb">Input types</span></dt><dd><svg class="ic on" viewBox="0 0 16 16" aria-hidden="true"><path d="M3 3.5h10M8 3.5v9.5"/></svg><svg class="ic on" viewBox="0 0 16 16" aria-hidden="true"><rect x="1.8" y="2.8" width="12.4" height="10.4" rx="1.6"/><path d="m2.4 11.6 3.6-3.6 3 3 2-2 2.6 2.6"/><circle cx="10.6" cy="6" r="1.1"/></svg><svg class="ic" viewBox="0 0 16 16" aria-hidden="true"><rect x="1.4" y="3.8" width="9.2" height="8.4" rx="1.6"/><path d="m10.6 7 4-2.2v6.4l-4-2.2"/></svg></dd></div></dl></aside></div><section class="ds"><h2><span class="lb">Role scores</span></h2><div class="pane on" data-pane-group="sv" data-pane="s"><div class="mrs"><div class="mr"><span class="ml"><a class="rl" href="../r/SORT.html">Footage Logging</a></span><span class="tt"><span class="tf" data-bar="role|SORT|hydrogen" style="--w:96.4%"></span></span><span class="tv" data-k="role|SORT|hydrogen">96.4</span><span class="rk"><svg class="hs" viewBox="0 0 10 10" aria-hidden="true"><path d="M3.9 1 2.9 9M7.1 1 6.1 9M1.3 3.7h7.6M.9 6.3h7.6"/></svg><span data-k="rk|role|SORT|hydrogen">3/20</span></span></div><div class="mr"><span class="ml"><a class="rl" href="../r/FIND.html">Shot Finding</a></span><span class="tt"><span class="tf" data-bar="role|FIND|hydrogen" style="--w:99.9%"></span></span><span class="tv" data-k="role|FIND|hydrogen">99.9</span><span class="rk"><svg class="hs" viewBox="0 0 10 10" aria-hidden="true"><path d="M3.9 1 2.9 9M7.1 1 6.1 9M1.3 3.7h7.6M.9 6.3h7.6"/></svg><span data-k="rk|role|FIND|hydrogen">1/20</span></span></div><div class="mr"><span class="ml"><a class="rl" href="../r/VO.html">Voiceover Editing</a></span><span class="tt"><span class="tf" data-bar="role|VO|hydrogen" style="--w:96.1%"></span></span><span class="tv" data-k="role|VO|hydrogen">96.1</span><span class="rk"><svg class="hs" viewBox="0 0 10 10" aria-hidden="true"><path d="M3.9 1 2.9 9M7.1 1 6.1 9M1.3 3.7h7.6M.9 6.3h7.6"/></svg><span data-k="rk|role|VO|hydrogen">5/20</span></span></div><div class="mr"><span class="ml"><a class="rl" href="../r/CUT.html">B-roll Editing</a></span><span class="tt"><span class="tf" data-bar="role|CUT|hydrogen" style="--w:47.4%"></span></span><span class="tv" data-k="role|CUT|hydrogen">47.4</span><span class="rk"><svg class="hs" viewBox="0 0 10 10" aria-hidden="true"><path d="M3.9 1 2.9 9M7.1 1 6.1 9M1.3 3.7h7.6M.9 6.3h7.6"/></svg><span data-k="rk|role|CUT|hydrogen">3/20</span></span></div><div class="mr"><span class="ml"><a class="rl" href="../r/TASTE.html">Taste</a></span><span class="tt"><span class="tf" data-bar="role|TASTE|hydrogen" style="--w:66.6%"></span></span><span class="tv" data-k="role|TASTE|hydrogen">66.6</span><span class="rk"><svg class="hs" viewBox="0 0 10 10" aria-hidden="true"><path d="M3.9 1 2.9 9M7.1 1 6.1 9M1.3 3.7h7.6M.9 6.3h7.6"/></svg><span data-k="rk|role|TASTE|hydrogen">7/20</span></span></div><div class="mr"><span class="ml"><a class="rl" href="../r/QC.html">Review</a></span><span class="tt"><span class="tf" data-bar="role|QC|hydrogen" style="--w:99.6%"></span></span><span class="tv" data-k="role|QC|hydrogen">99.6</span><span class="rk"><svg class="hs" viewBox="0 0 10 10" aria-hidden="true"><path d="M3.9 1 2.9 9M7.1 1 6.1 9M1.3 3.7h7.6M.9 6.3h7.6"/></svg><span data-k="rk|role|QC|hydrogen">3/20</span></span></div><div class="mr"><span class="ml"><a class="rl" href="../r/FIX.html">Revisions</a></span><span class="tt"><span class="tf" data-bar="role|FIX|hydrogen" style="--w:91.7%"></span></span><span class="tv" data-k="role|FIX|hydrogen">91.7</span><span class="rk"><svg class="hs" viewBox="0 0 10 10" aria-hidden="true"><path d="M3.9 1 2.9 9M7.1 1 6.1 9M1.3 3.7h7.6M.9 6.3h7.6"/></svg><span data-k="rk|role|FIX|hydrogen">4/20</span></span></div><div class="mr"><span class="ml"><a class="rl" href="../r/SUB.html">Subtitles</a></span><span class="tt"><span class="tf" data-bar="role|SUB|hydrogen" style="--w:66.1%"></span></span><span class="tv" data-k="role|SUB|hydrogen">66.1</span><span class="rk"><svg class="hs" viewBox="0 0 10 10" aria-hidden="true"><path d="M3.9 1 2.9 9M7.1 1 6.1 9M1.3 3.7h7.6M.9 6.3h7.6"/></svg><span data-k="rk|role|SUB|hydrogen">15/20</span></span></div></div></div><div class="pane" data-pane-group="sv" data-pane="n"><div class="mrs"><div class="mr"><span class="ml"><a class="rl" href="../r/SORT.html">Footage Logging</a></span><span class="tt"><span class="tf" data-bar="role0|SORT|hydrogen" style="--w:96.4%"></span></span><span class="tv" data-k="role0|SORT|hydrogen">96.4</span><span class="rk"><svg class="hs" viewBox="0 0 10 10" aria-hidden="true"><path d="M3.9 1 2.9 9M7.1 1 6.1 9M1.3 3.7h7.6M.9 6.3h7.6"/></svg><span data-k="rk|role0|SORT|hydrogen">4/20</span></span></div><div class="mr"><span class="ml"><a class="rl" href="../r/FIND.html">Shot Finding</a></span><span class="tt"><span class="tf" data-bar="role0|FIND|hydrogen" style="--w:100.0%"></span></span><span class="tv" data-k="role0|FIND|hydrogen">100.0</span><span class="rk"><svg class="hs" viewBox="0 0 10 10" aria-hidden="true"><path d="M3.9 1 2.9 9M7.1 1 6.1 9M1.3 3.7h7.6M.9 6.3h7.6"/></svg><span data-k="rk|role0|FIND|hydrogen">1/20</span></span></div><div class="mr"><span class="ml"><a class="rl" href="../r/VO.html">Voiceover Editing</a></span><span class="tt"><span class="tf" data-bar="role0|VO|hydrogen" style="--w:96.6%"></span></span><span class="tv" data-k="role0|VO|hydrogen">96.6</span><span class="rk"><svg class="hs" viewBox="0 0 10 10" aria-hidden="true"><path d="M3.9 1 2.9 9M7.1 1 6.1 9M1.3 3.7h7.6M.9 6.3h7.6"/></svg><span data-k="rk|role0|VO|hydrogen">7/20</span></span></div><div class="mr"><span class="ml"><a class="rl" href="../r/CUT.html">B-roll Editing</a></span><span class="tt"><span class="tf" data-bar="role0|CUT|hydrogen" style="--w:47.4%"></span></span><span class="tv" data-k="role0|CUT|hydrogen">47.4</span><span class="rk"><svg class="hs" viewBox="0 0 10 10" aria-hidden="true"><path d="M3.9 1 2.9 9M7.1 1 6.1 9M1.3 3.7h7.6M.9 6.3h7.6"/></svg><span data-k="rk|role0|CUT|hydrogen">3/20</span></span></div><div class="mr"><span class="ml"><a class="rl" href="../r/TASTE.html">Taste</a></span><span class="tt"><span class="tf" data-bar="role0|TASTE|hydrogen" style="--w:66.7%"></span></span><span class="tv" data-k="role0|TASTE|hydrogen">66.7</span><span class="rk"><svg class="hs" viewBox="0 0 10 10" aria-hidden="true"><path d="M3.9 1 2.9 9M7.1 1 6.1 9M1.3 3.7h7.6M.9 6.3h7.6"/></svg><span data-k="rk|role0|TASTE|hydrogen">3/20</span></span></div><div class="mr"><span class="ml"><a class="rl" href="../r/QC.html">Review</a></span><span class="tt"><span class="tf" data-bar="role0|QC|hydrogen" style="--w:100.0%"></span></span><span class="tv" data-k="role0|QC|hydrogen">100.0</span><span class="rk"><svg class="hs" viewBox="0 0 10 10" aria-hidden="true"><path d="M3.9 1 2.9 9M7.1 1 6.1 9M1.3 3.7h7.6M.9 6.3h7.6"/></svg><span data-k="rk|role0|QC|hydrogen">1/20</span></span></div><div class="mr"><span class="ml"><a class="rl" href="../r/FIX.html">Revisions</a></span><span class="tt"><span class="tf" data-bar="role0|FIX|hydrogen" style="--w:91.7%"></span></span><span class="tv" data-k="role0|FIX|hydrogen">91.7</span><span class="rk"><svg class="hs" viewBox="0 0 10 10" aria-hidden="true"><path d="M3.9 1 2.9 9M7.1 1 6.1 9M1.3 3.7h7.6M.9 6.3h7.6"/></svg><span data-k="rk|role0|FIX|hydrogen">2/20</span></span></div><div class="mr"><span class="ml"><a class="rl" href="../r/SUB.html">Subtitles</a></span><span class="tt"><span class="tf" data-bar="role0|SUB|hydrogen" style="--w:66.1%"></span></span><span class="tv" data-k="role0|SUB|hydrogen">66.1</span><span class="rk"><svg class="hs" viewBox="0 0 10 10" aria-hidden="true"><path d="M3.9 1 2.9 9M7.1 1 6.1 9M1.3 3.7h7.6M.9 6.3h7.6"/></svg><span data-k="rk|role0|SUB|hydrogen">17/20</span></span></div></div></div></section><section class="ds"><h2><span class="lb">Task scores</span></h2><div class="pane on" data-pane-group="sv" data-pane="s"><div class="tgrid"><div class="tb"><h3><a class="rl" href="../r/SORT.html">Footage Logging</a></h3><div class="tr"><span class="ti">Group and order recordings</span><span class="tt"><span class="tf" data-bar="run|hydrogen|SORT1" style="--w:100.0%"></span></span><span class="tv" data-k="run|hydrogen|SORT1">100.0</span></div><div class="tr"><span class="ti">Log short-form assets</span><span class="tt"><span class="tf" data-bar="run|hydrogen|SORT2" style="--w:100.0%"></span></span><span class="tv" data-k="run|hydrogen|SORT2">100.0</span></div><div class="tr"><span class="ti">Log film clips and check for duplicates</span><span class="tt"><span class="tf" data-bar="run|hydrogen|SORT3" style="--w:89.3%"></span></span><span class="tv" data-k="run|hydrogen|SORT3">89.3</span></div></div><div class="tb"><h3><a class="rl" href="../r/FIND.html">Shot Finding</a></h3><div class="tr"><span class="ti">Find shots from descriptions</span><span class="tt"><span class="tf" data-bar="run|hydrogen|FIND1" style="--w:99.9%"></span></span><span class="tv" data-k="run|hydrogen|FIND1">99.9</span></div><div class="tr"><span class="ti">Identify films and characters</span><span class="tt"><span class="tf" data-bar="run|hydrogen|FIND2" style="--w:100.0%"></span></span><span class="tv" data-k="run|hydrogen|FIND2">100.0</span></div><div class="tr"><span class="ti">Find shots and verify timestamps</span><span class="tt"><span class="tf" data-bar="run|hydrogen|FIND3" style="--w:99.8%"></span></span><span class="tv" data-k="run|hydrogen|FIND3">99.8</span></div></div><div class="tb"><h3><a class="rl" href="../r/VO.html">Voiceover Editing</a></h3><div class="tr"><span class="ti">Edit an intro with multiple takes</span><span class="tt"><span class="tf" data-bar="run|hydrogen|VO1" style="--w:99.8%"></span></span><span class="tv" data-k="run|hydrogen|VO1">99.8</span></div><div class="tr"><span class="ti">Edit a full voiceover to a brief</span><span class="tt"><span class="tf" data-bar="run|hydrogen|VO2" style="--w:99.7%"></span></span><span class="tv" data-k="run|hydrogen|VO2">99.7</span></div><div class="tr"><span class="ti">Verify the audio against the transcript</span><span class="tt"><span class="tf" data-bar="run|hydrogen|VO3" style="--w:88.9%"></span></span><span class="tv" data-k="run|hydrogen|VO3">88.9</span></div></div><div class="tb"><h3><a class="rl" href="../r/CUT.html">B-roll Editing</a></h3><div class="tr"><span class="ti">Pick visuals for five passages</span><span class="tt"><span class="tf" data-bar="run|hydrogen|CUT1" style="--w:51.9%"></span></span><span class="tv" data-k="run|hydrogen|CUT1">51.9</span></div><div class="tr"><span class="ti">Plan visuals for extended narration</span><span class="tt"><span class="tf" data-bar="run|hydrogen|CUT3" style="--w:42.9%"></span></span><span class="tv" data-k="run|hydrogen|CUT3">42.9</span></div></div><div class="tb"><h3><a class="rl" href="../r/TASTE.html">Taste</a></h3><div class="tr"><span class="ti">Choose edits using the rules</span><span class="tt"><span class="tf" data-bar="run|hydrogen|TASTE1" style="--w:100.0%"></span></span><span class="tv" data-k="run|hydrogen|TASTE1">100.0</span></div><div class="tr"><span class="ti">Choose edits by judgment</span><span class="tt"><span class="tf" data-bar="run|hydrogen|TASTE2" style="--w:33.3%"></span></span><span class="tv" data-k="run|hydrogen|TASTE2">33.3</span></div><div class="tr"><span class="ti">Choose the best in and out points</span><span class="tt"><span class="tf" data-bar="run|hydrogen|TASTE3" style="--w:11.1%"></span></span><span class="tv" data-k="run|hydrogen|TASTE3">11.1</span></div></div><div class="tb"><h3><a class="rl" href="../r/QC.html">Review</a></h3><div class="tr"><span class="ti">Check for visible defects</span><span class="tt"><span class="tf" data-bar="run|hydrogen|QC1" style="--w:99.8%"></span></span><span class="tv" data-k="run|hydrogen|QC1">99.8</span></div><div class="tr"><span class="ti">Check audio and subtitles</span><span class="tt"><span class="tf" data-bar="run|hydrogen|QC2" style="--w:100.0%"></span></span><span class="tv" data-k="run|hydrogen|QC2">100.0</span></div><div class="tr"><span class="ti">Spot subtle editing issues</span><span class="tt"><span class="tf" data-bar="run|hydrogen|QC3" style="--w:99.0%"></span></span><span class="tv" data-k="run|hydrogen|QC3">99.0</span></div></div><div class="tb"><h3><a class="rl" href="../r/FIX.html">Revisions</a></h3><div class="tr"><span class="ti">Apply three clear notes</span><span class="tt"><span class="tf" data-bar="run|hydrogen|FIX1" style="--w:100.0%"></span></span><span class="tv" data-k="run|hydrogen|FIX1">100.0</span></div><div class="tr"><span class="ti">Revise the specified section</span><span class="tt"><span class="tf" data-bar="run|hydrogen|FIX2" style="--w:100.0%"></span></span><span class="tv" data-k="run|hydrogen|FIX2">100.0</span></div><div class="tr"><span class="ti">Clarify which clip to change</span><span class="tt"><span class="tf" data-bar="run|hydrogen|FIX3" style="--w:75.0%"></span></span><span class="tv" data-k="run|hydrogen|FIX3">75.0</span></div></div><div class="tb"><h3><a class="rl" href="../r/SUB.html">Subtitles</a></h3><div class="tr"><span class="ti">Proofread voiceover subtitles</span><span class="tt"><span class="tf" data-bar="run|hydrogen|SUB1" style="--w:98.4%"></span></span><span class="tv" data-k="run|hydrogen|SUB1">98.4</span></div><div class="tr"><span class="ti">Proofread and position subtitles</span><span class="tt"><span class="tf" data-bar="run|hydrogen|SUB2" style="--w:99.9%"></span></span><span class="tv" data-k="run|hydrogen|SUB2">99.9</span></div><div class="tr"><span class="ti">Subtitle the audio in the clip</span><span class="tt"><span class="tf" data-bar="run|hydrogen|SUB3" style="--w:0.0%"></span></span><span class="tv" data-k="run|hydrogen|SUB3">0.0</span></div></div></div></div><div class="pane" data-pane-group="sv" data-pane="n"><div class="tgrid"><div class="tb"><h3><a class="rl" href="../r/SORT.html">Footage Logging</a></h3><div class="tr"><span class="ti">Group and order recordings</span><span class="tt"><span class="tf" data-bar="run0|hydrogen|SORT1" style="--w:100.0%"></span></span><span class="tv" data-k="run0|hydrogen|SORT1">100.0</span></div><div class="tr"><span class="ti">Log short-form assets</span><span class="tt"><span class="tf" data-bar="run0|hydrogen|SORT2" style="--w:100.0%"></span></span><span class="tv" data-k="run0|hydrogen|SORT2">100.0</span></div><div class="tr"><span class="ti">Log film clips and check for duplicates</span><span class="tt"><span class="tf" data-bar="run0|hydrogen|SORT3" style="--w:89.3%"></span></span><span class="tv" data-k="run0|hydrogen|SORT3">89.3</span></div></div><div class="tb"><h3><a class="rl" href="../r/FIND.html">Shot Finding</a></h3><div class="tr"><span class="ti">Find shots from descriptions</span><span class="tt"><span class="tf" data-bar="run0|hydrogen|FIND1" style="--w:100.0%"></span></span><span class="tv" data-k="run0|hydrogen|FIND1">100.0</span></div><div class="tr"><span class="ti">Identify films and characters</span><span class="tt"><span class="tf" data-bar="run0|hydrogen|FIND2" style="--w:100.0%"></span></span><span class="tv" data-k="run0|hydrogen|FIND2">100.0</span></div><div class="tr"><span class="ti">Find shots and verify timestamps</span><span class="tt"><span class="tf" data-bar="run0|hydrogen|FIND3" style="--w:100.0%"></span></span><span class="tv" data-k="run0|hydrogen|FIND3">100.0</span></div></div><div class="tb"><h3><a class="rl" href="../r/VO.html">Voiceover Editing</a></h3><div class="tr"><span class="ti">Edit an intro with multiple takes</span><span class="tt"><span class="tf" data-bar="run0|hydrogen|VO1" style="--w:100.0%"></span></span><span class="tv" data-k="run0|hydrogen|VO1">100.0</span></div><div class="tr"><span class="ti">Edit a full voiceover to a brief</span><span class="tt"><span class="tf" data-bar="run0|hydrogen|VO2" style="--w:100.0%"></span></span><span class="tv" data-k="run0|hydrogen|VO2">100.0</span></div><div class="tr"><span class="ti">Verify the audio against the transcript</span><span class="tt"><span class="tf" data-bar="run0|hydrogen|VO3" style="--w:89.9%"></span></span><span class="tv" data-k="run0|hydrogen|VO3">89.9</span></div></div><div class="tb"><h3><a class="rl" href="../r/CUT.html">B-roll Editing</a></h3><div class="tr"><span class="ti">Pick visuals for five passages</span><span class="tt"><span class="tf" data-bar="run0|hydrogen|CUT1" style="--w:52.0%"></span></span><span class="tv" data-k="run0|hydrogen|CUT1">52.0</span></div><div class="tr"><span class="ti">Plan visuals for extended narration</span><span class="tt"><span class="tf" data-bar="run0|hydrogen|CUT3" style="--w:42.9%"></span></span><span class="tv" data-k="run0|hydrogen|CUT3">42.9</span></div></div><div class="tb"><h3><a class="rl" href="../r/TASTE.html">Taste</a></h3><div class="tr"><span class="ti">Choose edits using the rules</span><span class="tt"><span class="tf" data-bar="run0|hydrogen|TASTE1" style="--w:100.0%"></span></span><span class="tv" data-k="run0|hydrogen|TASTE1">100.0</span></div><div class="tr"><span class="ti">Choose edits by judgment</span><span class="tt"><span class="tf" data-bar="run0|hydrogen|TASTE2" style="--w:33.3%"></span></span><span class="tv" data-k="run0|hydrogen|TASTE2">33.3</span></div><div class="tr"><span class="ti">Choose the best in and out points</span><span class="tt"><span class="tf" data-bar="run0|hydrogen|TASTE3" style="--w:11.1%"></span></span><span class="tv" data-k="run0|hydrogen|TASTE3">11.1</span></div></div><div class="tb"><h3><a class="rl" href="../r/QC.html">Review</a></h3><div class="tr"><span class="ti">Check for visible defects</span><span class="tt"><span class="tf" data-bar="run0|hydrogen|QC1" style="--w:100.0%"></span></span><span class="tv" data-k="run0|hydrogen|QC1">100.0</span></div><div class="tr"><span class="ti">Check audio and subtitles</span><span class="tt"><span class="tf" data-bar="run0|hydrogen|QC2" style="--w:100.0%"></span></span><span class="tv" data-k="run0|hydrogen|QC2">100.0</span></div><div class="tr"><span class="ti">Spot subtle editing issues</span><span class="tt"><span class="tf" data-bar="run0|hydrogen|QC3" style="--w:100.0%"></span></span><span class="tv" data-k="run0|hydrogen|QC3">100.0</span></div></div><div class="tb"><h3><a class="rl" href="../r/FIX.html">Revisions</a></h3><div class="tr"><span class="ti">Apply three clear notes</span><span class="tt"><span class="tf" data-bar="run0|hydrogen|FIX1" style="--w:100.0%"></span></span><span class="tv" data-k="run0|hydrogen|FIX1">100.0</span></div><div class="tr"><span class="ti">Revise the specified section</span><span class="tt"><span class="tf" data-bar="run0|hydrogen|FIX2" style="--w:100.0%"></span></span><span class="tv" data-k="run0|hydrogen|FIX2">100.0</span></div><div class="tr"><span class="ti">Clarify which clip to change</span><span class="tt"><span class="tf" data-bar="run0|hydrogen|FIX3" style="--w:75.0%"></span></span><span class="tv" data-k="run0|hydrogen|FIX3">75.0</span></div></div><div class="tb"><h3><a class="rl" href="../r/SUB.html">Subtitles</a></h3><div class="tr"><span class="ti">Proofread voiceover subtitles</span><span class="tt"><span class="tf" data-bar="run0|hydrogen|SUB1" style="--w:98.4%"></span></span><span class="tv" data-k="run0|hydrogen|SUB1">98.4</span></div><div class="tr"><span class="ti">Proofread and position subtitles</span><span class="tt"><span class="tf" data-bar="run0|hydrogen|SUB2" style="--w:100.0%"></span></span><span class="tv" data-k="run0|hydrogen|SUB2">100.0</span></div><div class="tr"><span class="ti">Subtitle the audio in the clip</span><span class="tt"><span class="tf" data-bar="run0|hydrogen|SUB3" style="--w:0.0%"></span></span><span class="tv" data-k="run0|hydrogen|SUB3">0.0</span></div></div></div></div></section><section class="ds ds-speed"><h2><span class="lb">Speed tests</span></h2><div class="mrs"><div class="mr"><span class="ml"><span class="lb">Median time to first text</span><sup class="st">*</sup></span><span class="tt"><span class="tf" data-bar="sm|first_text_s|hydrogen" style="--w:27.6%"></span></span><span class="tv" data-k="sm|first_text_s|hydrogen">18.8s</span><span class="rk"><svg class="hs" viewBox="0 0 10 10" aria-hidden="true"><path d="M3.9 1 2.9 9M7.1 1 6.1 9M1.3 3.7h7.6M.9 6.3h7.6"/></svg><span data-k="rk|sm|first_text_s|hydrogen">12/20</span></span></div><div class="mr"><span class="ml"><span class="lb">Median time to first event</span><sup class="st">*</sup></span><span class="tt"><span class="tf" data-bar="sm|first_event_s|hydrogen" style="--w:100.0%"></span></span><span class="tv" data-k="sm|first_event_s|hydrogen">2.5s</span><span class="rk"><svg class="hs" viewBox="0 0 10 10" aria-hidden="true"><path d="M3.9 1 2.9 9M7.1 1 6.1 9M1.3 3.7h7.6M.9 6.3h7.6"/></svg><span data-k="rk|sm|first_event_s|hydrogen">1/20</span></span></div><div class="mr"><span class="ml"><span class="lb">Median speed test time</span><sup class="st">*</sup></span><span class="tt"><span class="tf" data-bar="sm|total_s|hydrogen" style="--w:20.8%"></span></span><span class="tv" data-k="sm|total_s|hydrogen">35.7s</span><span class="rk"><svg class="hs" viewBox="0 0 10 10" aria-hidden="true"><path d="M3.9 1 2.9 9M7.1 1 6.1 9M1.3 3.7h7.6M.9 6.3h7.6"/></svg><span data-k="rk|sm|total_s|hydrogen">13/20</span></span></div><div class="mr"><span class="ml"><span class="lb">Median model time</span><sup class="st">*</sup></span><span class="tt"><span class="tf" data-bar="sm|model_s|hydrogen" style="--w:40.5%"></span></span><span class="tv" data-k="sm|model_s|hydrogen">17.9s</span><span class="rk"><svg class="hs" viewBox="0 0 10 10" aria-hidden="true"><path d="M3.9 1 2.9 9M7.1 1 6.1 9M1.3 3.7h7.6M.9 6.3h7.6"/></svg><span data-k="rk|sm|model_s|hydrogen">10/20</span></span></div><div class="mr"><span class="ml"><span class="lb">Median startup time</span><sup class="st">*</sup></span><span class="tt"><span class="tf" data-bar="sm|startup_s|hydrogen" style="--w:0.2%"></span></span><span class="tv" data-k="sm|startup_s|hydrogen">16.5s</span><span class="rk"><svg class="hs" viewBox="0 0 10 10" aria-hidden="true"><path d="M3.9 1 2.9 9M7.1 1 6.1 9M1.3 3.7h7.6M.9 6.3h7.6"/></svg><span data-k="rk|sm|startup_s|hydrogen">19/20</span></span></div><div class="mr"><span class="ml"><span class="lb">Correct speed test runs</span></span><span class="tt"><span class="tf" data-bar="sm|correct|hydrogen" style="--w:100.0%"></span></span><span class="tv" data-k="sm|correct|hydrogen">15/15</span><span class="rk"><svg class="hs" viewBox="0 0 10 10" aria-hidden="true"><path d="M3.9 1 2.9 9M7.1 1 6.1 9M1.3 3.7h7.6M.9 6.3h7.6"/></svg><span data-k="rk|sm|correct|hydrogen">1/20</span></span></div></div></section><section class="ds dl2"><h2><span class="lb">Tasks with false claims</span></h2><span class="ln" data-k="lie|hydrogen">0</span><span class="chips"></span></section><p class="note"><sup class="st">*</sup><span class="lb">These figures are for reference. Actual times and speeds vary by time of day, number of concurrent users, network conditions, and provider load.</span></p></main><div id="audit-tip" class="mark-tip" role="tooltip" hidden><span class="lb">This access route provides incomplete tool call logs. Some instances of out-of-directory access and false claims about image inspection may go undetected. Pass counts and honesty cannot be compared directly with those of other models.</span></div><footer id="vc" class="vc" hidden><span class="lb">Total visitors</span><b></b></footer><dialog id="first" data-v="2458735058" aria-labelledby="first-t" aria-describedby="first-b"><h2 id="first-t"><span class="lb">Disclaimer</span></h2><div class="fb" id="first-b"><p class="lead"><span class="lb">One shot. Each task was run once, with no averaging across runs. Scores are for reference only.</span></p><p class="it"><span class="lb">The benchmark covers 8 roles and 22 scored tasks drawn from one creator&#x27;s editing workflow. It does not measure general ability. Results reflect the access route, reasoning effort, tool setup, and model version used during testing in November 2026. Timing also depends on network conditions and provider load at the time. This project sets its own scoring rules and reviews some tasks by hand. See the notes next to flagged results.</span></p><p class="foot"><span class="lb">The tasks and answer keys are private. This is a personal project with no affiliation to model providers. It offers no advice on which model to choose.</span></p></div><form method="dialog"><button autofocus><span class="lb">Got it</span></button></form></dialog>
+<script>
+(()=>{
+const first=document.getElementById('first');  // 关掉后在本地存储记下这一版（data-v），版本变了再弹；存储用不了就每次都弹
+if(first){let seen=null;try{seen=localStorage.getItem('vb-first-seen')}catch(e){}
+  if(seen!==first.dataset.v)first.showModal();
+  first.addEventListener('close',()=>{try{localStorage.setItem('vb-first-seen',first.dataset.v)}catch(e){}})}
+const $$=(s,r=document)=>[...r.querySelectorAll(s)];
+const hide=document.getElementById('hide');
+let active=null, pinned=false;
+function closeTip(){$$('.mark-tip').forEach(t=>t.hidden=true);active=null;pinned=false}
+function showTip(mark){
+  const tip=document.getElementById(mark.getAttribute('aria-describedby'));
+  if(!tip)return;
+  $$('.mark-tip').forEach(t=>t.hidden=t!==tip);
+  active=mark;
+  const r=mark.getBoundingClientRect(), t=tip.getBoundingClientRect();
+  tip.style.left=Math.max(12,Math.min(innerWidth-t.width-12,r.left+r.width/2-t.width/2))+'px';
+  tip.style.top=Math.max(12,Math.min(innerHeight-t.height-12,r.bottom+t.height+8>innerHeight?r.top-t.height-8:r.bottom+8))+'px';
+}
+document.addEventListener('pointerover',e=>{const m=e.target.closest('[data-audit]');if(m&&e.pointerType!=='touch')showTip(m)});
+document.addEventListener('pointerout',e=>{if(e.target.closest('[data-audit]')&&!pinned)closeTip()});
+document.addEventListener('focusin',e=>{if(e.target.matches('[data-audit]'))showTip(e.target)});
+document.addEventListener('focusout',e=>{if(e.target.matches('[data-audit]'))closeTip()});
+document.addEventListener('click',e=>{
+  const m=e.target.closest('[data-audit]');
+  if(m){e.preventDefault();e.stopPropagation();if(active===m&&pinned)closeTip();else{showTip(m);pinned=true}}
+  else closeTip();
+},true);
+document.addEventListener('keydown',e=>{
+  if(e.key==='Escape')closeTip();
+  if(e.target.matches('[data-audit]')&&(e.key==='Enter'||e.key===' ')){e.preventDefault();showTip(e.target);pinned=true}
+});
+window.addEventListener('resize',closeTip);
+window.addEventListener('scroll',()=>{if(active)showTip(active)},true);
+function apply(){
+  const off=$$('[data-toggle].off').map(b=>b.dataset.toggle);
+  hide.textContent=off.length?off.map(i=>`.chart [data-m="${i}"]`).join(',')+'{display:none!important}':'';
+}
+document.addEventListener('click',e=>{
+  const t=e.target.closest('[data-tab]');
+  if(t){
+    const g=t.dataset.group;
+    $$(`[data-group="${g}"]`).forEach(b=>b.classList.toggle('on',b===t));
+    $$(`[data-pane-group="${g}"]`).forEach(p=>p.classList.toggle('on',p.dataset.pane===t.dataset.tab));
+    return;
+  }
+  const s=e.target.closest('[data-scale]');
+  if(s){
+    const sec=s.closest('section');
+    $$('[data-scale]',sec).forEach(b=>b.classList.toggle('on',b===s));
+    $$('.sc',sec).forEach(c=>{c.classList.toggle('lin',s.dataset.scale==='lin');c.classList.toggle('log',s.dataset.scale==='log')});
+    return;
+  }
+  const m=e.target.closest('[data-toggle]');
+  if(m){m.classList.toggle('off');apply();return}
+  if(e.target.closest('[data-reset]')){$$('[data-toggle]').forEach(b=>b.classList.remove('off'));apply();return}
+  const sd=e.target.closest('[data-side]');
+  if(sd){sd.closest('.side').classList.toggle('open')}
+});
+document.addEventListener('change',e=>{
+  if(e.target.matches('[data-pareto]')){
+    $$('.sc',e.target.closest('section')).forEach(c=>c.classList.toggle('pareto',e.target.checked));
+  }
+});
+const vc=document.getElementById('vc');  // 累计访客（SPEC 11.29）：只在线上站发；挂了、被拦、超时都只是不显示
+if(vc&&location.origin==='https://huaiyuan-jiang.github.io')
+  fetch('https://vb.xn--s7t58y0w1a.top/n',{method:'POST',body:JSON.stringify({p:location.pathname,r:document.referrer&&new URL(document.referrer).hostname})})
+    .then(r=>r.json()).then(d=>{if(d.n>0){vc.lastChild.textContent=d.n;vc.hidden=false}}).catch(()=>{});
+})();
+</script>
+</body>
+</html>
